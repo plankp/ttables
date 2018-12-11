@@ -1,6 +1,7 @@
 package com.ymcmp.ttable;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,6 +89,25 @@ public final class TableUtils {
                 fmt.setCellFromText(i + 1, j, i < v.length ? v[i] : null);
             }
         }
+        return fmt;
+    }
+
+    public static <T> TableBuilder fromTable(final List<String> columnNames, List<T> rowData, Function<? super T, ? extends List<String>> mapper) {
+        final TableBuilder fmt = new TableBuilder(rowData.size() + 1, columnNames.size());
+
+        // Fill column names on 0th row
+        for (int i = 0; i < fmt.columns; ++i) {
+            fmt.setCellFromText(0, i, columnNames.get(i));
+        }
+
+        // Fill values
+        for (int i = 0; i < fmt.rows - 1; ++i) {
+            final List<String> colData = mapper.apply(rowData.get(i));
+            for (int j = 0; j < fmt.columns; ++j) {
+                fmt.setCellFromText(i + 1, j, j < colData.size() ? colData.get(j) : null);
+            }
+        }
+
         return fmt;
     }
 

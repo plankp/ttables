@@ -1,11 +1,11 @@
 package com.ymcmp.ttable;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import org.junit.Test;
-
 
 import static com.ymcmp.ttable.border.Border.ASCII_BORDER;
 import static com.ymcmp.ttable.border.Corner.ASCII_CORNER;
@@ -106,5 +106,43 @@ public class TableUtilsTest {
                 "|----+---+-----|\n" +
                 "|1.0 | q | null|\n" +
                 "+--------------+", fmt.toString());
+    }
+
+    @Test
+    public void fromTableHasDataAsRows() {
+        final Person joe = new Person("Joe", 20, false);
+        final Person leo = new Person("Leo", 19, true);
+        final Person tim = new Person("Tim", 38, false);
+
+        final TableFormatter fmt = TableUtils
+                .fromTable(Person.fieldNames(), Arrays.asList(joe, leo, tim), Person::collect)
+                .align(WidthAlignment.LEFT, HeightAlignment.CENTER);
+
+        assertEquals(
+                "name age student?\n" +
+                "Joe  20  false   \n" +
+                "Leo  19  true    \n" +
+                "Tim  38  false   ", fmt.toString());
+    }
+}
+
+final class Person {
+
+    public final String name;
+    public final int age;
+    public final boolean student;
+
+    public Person(String name, int age, boolean student) {
+        this.name = name;
+        this.age = age;
+        this.student = student;
+    }
+
+    public static List<String> fieldNames() {
+        return Arrays.asList("name", "age", "student?");
+    }
+
+    public List<String> collect() {
+        return Arrays.asList(name, Integer.toString(age), Boolean.toString(student));
     }
 }
