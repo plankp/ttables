@@ -1,4 +1,4 @@
-# TTables
+# TTables [![Build Status](https://www.travis-ci.org/plankp/ttables.svg?branch=master)](https://www.travis-ci.org/plankp/ttables)
 
 Text table generator in java.
 
