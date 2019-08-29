@@ -29,29 +29,6 @@ public class TableBuilder {
         this.colMaxLength = new int[columns];
     }
 
-    public void setCellFromText(int row, int col, String str) {
-        setCell(row, col, new Cell(str != null ? str.split("\n") : new String[0]));
-    }
-
-    public void setCellFromLines(int row, int col, String... lines) {
-        setCell(row, col, new Cell(lines));
-    }
-
-    public void setCell(int row, int col, Cell cell) {
-        if (cell == null) cell = new Cell(new String[0]);
-        table[row][col] = cell;
-
-        // Calculate max lengths
-        final int lineCount = cell.getLineCount();
-        if (rowMaxLength[row] < lineCount) {
-            rowMaxLength[row] = lineCount;
-        }
-        final int cmp = cell.getMaxLineLength();
-        if (colMaxLength[col] < cmp) {
-            colMaxLength[col] = cmp;
-        }
-    }
-
     public Cell getCell(int row, int col) {
         return this.ensureGetCell(row, col);
     }
@@ -59,9 +36,31 @@ public class TableBuilder {
     private Cell ensureGetCell(int row, int col) {
         Cell cell = this.table[row][col];
         if (cell == null) {
-            this.table[row][col] = cell = new Cell(new String[0]);
+            this.table[row][col] = cell = new Cell();
         }
         return cell;
+    }
+
+    public void recomputeCellSizes() {
+        // Reset size info
+        Arrays.fill(this.rowMaxLength, 0);
+        Arrays.fill(this.colMaxLength, 0);
+
+        // Fill in the maximum length for each row and column
+        for (int i = 0; i < this.rows; ++i) {
+            for (int j = 0; j < this.columns; ++j) {
+                final Cell cell = this.ensureGetCell(i, j);
+                final int lineCount = cell.getLineCount();
+                final int longestLineLength = cell.getMaxLineLength();
+
+                if (this.rowMaxLength[i] < lineCount) {
+                    this.rowMaxLength[i] = lineCount;
+                }
+                if (this.colMaxLength[j] < longestLineLength) {
+                    this.colMaxLength[j] = longestLineLength;
+                }
+            }
+        }
     }
 
     public TableFormatter align() {
@@ -69,6 +68,8 @@ public class TableBuilder {
     }
 
     public TableFormatter align(final AlignmentStrategy alignStrat) {
+        this.recomputeCellSizes();
+
         final String[][][] result = new String[rows][columns][];
         for (int i = 0; i < rows; ++i) {
             final int newHeight = rowMaxLength[i];
@@ -84,6 +85,8 @@ public class TableBuilder {
     }
 
     public TableFormatter forceAlign(final AlignmentStrategy alignStrat) {
+        this.recomputeCellSizes();
+
         final String[][][] result = new String[rows][columns][];
         for (int i = 0; i < rows; ++i) {
             final int newHeight = rowMaxLength[i];

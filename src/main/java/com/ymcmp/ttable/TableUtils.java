@@ -30,7 +30,7 @@ public final class TableUtils {
         for (int i = 0; i < rows; ++i) {
             final T[] alias = data[i];
             for (int j = 0; j < cols; ++j) {
-                fmt.setCellFromText(i, j, j < alias.length ? mapper.apply(alias[j]) : null);
+                fmt.getCell(i, j).setText(j < alias.length ? mapper.apply(alias[j]) : null);
             }
         }
         return fmt;
@@ -48,8 +48,8 @@ public final class TableUtils {
         int i = 0;
         for (final Map.Entry<K, V> pair : map.entrySet()) {
             final int col = i++;
-            fmt.setCellFromText(0, col, String.valueOf(pair.getKey()));
-            fmt.setCellFromText(1, col, mapper.apply(pair.getValue()));
+            fmt.getCell(0, col).setText(String.valueOf(pair.getKey()));
+            fmt.getCell(1, col).setText(mapper.apply(pair.getValue()));
         }
         return fmt;
     }
@@ -79,14 +79,14 @@ public final class TableUtils {
 
         // Fill keys
         for (int i = 0; i < cols; ++i) {
-            fmt.setCellFromText(0, i, keys.get(i));
+            fmt.getCell(0, i).setText(keys.get(i));
         }
 
         // Fill values
         for (int j = 0; j < cols; ++j) {
             final String[] v = values.get(j);
             for (int i = 0; i < rows; ++i) {
-                fmt.setCellFromText(i + 1, j, i < v.length ? v[i] : null);
+                fmt.getCell(i + 1, j).setText(i < v.length ? v[i] : null);
             }
         }
         return fmt;
@@ -97,14 +97,14 @@ public final class TableUtils {
 
         // Fill column names on 0th row
         for (int i = 0; i < fmt.columns; ++i) {
-            fmt.setCellFromText(0, i, columnNames.get(i));
+            fmt.getCell(0, i).setText(columnNames.get(i));
         }
 
         // Fill values
         for (int i = 0; i < fmt.rows - 1; ++i) {
             final List<String> colData = mapper.apply(rowData.get(i));
             for (int j = 0; j < fmt.columns; ++j) {
-                fmt.setCellFromText(i + 1, j, j < colData.size() ? colData.get(j) : null);
+                fmt.getCell(i + 1, j).setText(j < colData.size() ? colData.get(j) : null);
             }
         }
 

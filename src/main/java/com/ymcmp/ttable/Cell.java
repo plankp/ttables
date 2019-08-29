@@ -7,14 +7,18 @@ import java.util.stream.Collectors;
 public final class Cell {
 
     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+    private static final String[] EMPTY_STR_ARRAY = new String[0];
 
-    private final String[] lines;
-
+    private String[] lines = EMPTY_STR_ARRAY;
     private char padding = ' ';
     private AlignmentStrategy preferred;
 
-    public Cell(String[] lines) {
-        this.lines = lines;
+    public void setText(String str) {
+        this.lines = (str == null) ? EMPTY_STR_ARRAY : str.split("\n");
+    }
+
+    public void setLines(String[] lines) {
+        this.lines = (lines == null) ? EMPTY_STR_ARRAY : lines;
     }
 
     public void setPreferredAlignment(AlignmentStrategy preferred) {
