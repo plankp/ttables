@@ -8,30 +8,14 @@ public final class Cell {
 
     private final String[] lines;
 
-    private WidthAlignment wAlign;
-    private HeightAlignment hAlign;
+    private AlignmentStrategy preferred;
 
     public Cell(String[] lines) {
-        this(lines, null, null);
-    }
-
-    public Cell(String[] lines, WidthAlignment wAlign, HeightAlignment hAlign) {
         this.lines = lines;
-        this.wAlign = wAlign;
-        this.hAlign = hAlign;
     }
 
-    public static Cell fromText(final String str) {
-        return fromText(str, null, null);
-    }
-
-    public static Cell fromText(final String str, WidthAlignment wAlign, HeightAlignment hAlign) {
-        return new Cell(str == null ? new String[0] : str.split("\n"), wAlign, hAlign);
-    }
-
-    public void setPreferredAlignment(WidthAlignment wAlign, HeightAlignment hAlign) {
-        this.wAlign = wAlign;
-        this.hAlign = hAlign;
+    public void setPreferredAlignment(AlignmentStrategy preferred) {
+        this.preferred = preferred;
     }
 
     public int getLineCount() {
@@ -48,76 +32,50 @@ public final class Cell {
                 .max().orElse(0);
     }
 
-    public String[] align(int newHeight, int newWidth, HeightAlignment hDefAlign, WidthAlignment wDefAlign) {
-        return forceAlign(newHeight, newWidth,
-                hAlign == null ? hDefAlign : hAlign,
-                wAlign == null ? wDefAlign : wAlign);
+    public String[] align(final int newHeight, final int newWidth, final AlignmentStrategy backupStrat) {
+        return alignHelper(newHeight, newWidth, this.lines, this.preferred != null ? this.preferred : backupStrat);
     }
 
-    public String[] forceAlign(final int newHeight, final int newWidth, final HeightAlignment hAlign, final WidthAlignment wAlign) {
+    public String[] forceAlign(final int newHeight, final int newWidth, final AlignmentStrategy strat) {
+        return alignHelper(newHeight, newWidth, this.lines, strat);
+    }
+
+    private static String[] alignHelper(final int newHeight, final int newWidth, final String[] lines, final AlignmentStrategy strategy) {
         final String[] result = new String[newHeight];
         final String fullPad = new String(repeatChars(newWidth, ' '));
 
         // Align height
-        final int start;
-        switch (hAlign) {
-            case TOP:
-                start = 0;
-                Arrays.fill(result, lines.length, result.length, fullPad);
-                break;
-            case CENTER:
-                start = (result.length - lines.length) / 2;
-                Arrays.fill(result, 0, start, fullPad);
-                Arrays.fill(result, start + lines.length, result.length, fullPad);
-                break;
-            case BOTTOM:
-                start = result.length - lines.length;
-                Arrays.fill(result, 0, start, fullPad);
-                break;
-            default:
-                throw new AssertionError("Unhandled height alignment " + hAlign);
-        }
-
-        System.arraycopy(lines, 0, result, start, lines.length);
+        final int startHeight = strategy.getFirstLineOffset(lines.length, result.length);
+        Arrays.fill(result, 0, startHeight, fullPad);
+        Arrays.fill(result, startHeight + lines.length, result.length, fullPad);
 
         // Align width
-        // Only need to process $lines.length from $start in $result[]
-        // since the other lines are added in and are already padded
+        // Only process the region where there is actually text
         for (int i = 0; i < lines.length; ++i) {
-            final int offset = start + i;
-            final String original = result[offset];
-            final int padWidth = newWidth - original.length();
+            final int height = startHeight + i;
 
-            if (padWidth < 1) {
+            final String line = lines[i];
+            final int leftPadding = strategy.getFirstCharOffset(line.length(), newWidth);
+            final int rightPadding = newWidth - line.length() - leftPadding;
+
+            if (leftPadding <= 0 && rightPadding <= 0) {
                 // No padding needed
+                result[height] = line;
                 continue;
             }
 
-            final StringBuilder sb = new StringBuilder(original);
-            switch (wAlign) {
-                case LEFT:
-                    sb.append(repeatChars(padWidth, ' '));
-                    break;
-                case CENTER: {
-                    final int midpoint = padWidth / 2;
-                    sb.insert(0, repeatChars(midpoint, ' '));
-                    sb.append(repeatChars(padWidth - midpoint, ' '));
-                    break;
-                }
-                case RIGHT:
-                    sb.insert(0, repeatChars(padWidth, ' '));
-                    break;
-                default:
-                    throw new AssertionError("Unhandled width alignment " + wAlign);
-            }
-            result[offset] = sb.toString();
+            result[height] = new StringBuilder(newWidth)
+                    .append(repeatChars(leftPadding, ' '))
+                    .append(line)
+                    .append(repeatChars(rightPadding, ' '))
+                    .toString();
         }
 
         return result;
     }
 
     private static char[] repeatChars(int length, char unit) {
-        final char[] array = new char[length];
+        final char[] array = new char[Math.max(0, length)];
         Arrays.fill(array, unit);
         return array;
     }

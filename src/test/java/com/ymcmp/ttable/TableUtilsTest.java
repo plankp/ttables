@@ -116,7 +116,7 @@ public class TableUtilsTest {
 
         final TableFormatter fmt = TableUtils
                 .fromTable(Person.fieldNames(), Arrays.asList(joe, leo, tim), Person::collect)
-                .align(WidthAlignment.LEFT, HeightAlignment.CENTER);
+                .align(TableBuilderTest.LEFT_CENTER_ALIGN);
 
         assertEquals(
                 "name age student?\n" +

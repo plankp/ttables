@@ -2,7 +2,14 @@ package com.ymcmp.ttable;
 
 import java.util.Arrays;
 
+import com.ymcmp.ttable.width.WidthAlignmentStrategy;
+import com.ymcmp.ttable.height.HeightAlignmentStrategy;
+
 public class TableBuilder {
+
+    public static final AlignmentStrategy DEFAULT_ALIGN_STRAT = new AlignmentStrategy(
+            new com.ymcmp.ttable.width.CenterAlignmentStrategy(),
+            new com.ymcmp.ttable.height.CenterAlignmentStrategy());
 
     public final int rows;
     public final int columns;
@@ -23,37 +30,37 @@ public class TableBuilder {
     }
 
     public TableFormatter align() {
-        return align(WidthAlignment.CENTER, HeightAlignment.CENTER);
+        return align(DEFAULT_ALIGN_STRAT);
     }
 
-    public TableFormatter align(final WidthAlignment wAlign, final HeightAlignment hAlign) {
+    public TableFormatter align(final AlignmentStrategy alignStrat) {
         final String[][][] result = new String[rows][columns][];
         for (int i = 0; i < rows; ++i) {
             final int newHeight = rowMaxLength[i];
             for (int j = 0; j < columns; ++j) {
-                result[i][j] = this.table[i][j].align(newHeight, colMaxLength[j], hAlign, wAlign);
+                result[i][j] = this.table[i][j].align(newHeight, colMaxLength[j], alignStrat);
             }
         }
         return new TableFormatter(result, rowMaxLength, colMaxLength);
     }
 
     public TableFormatter forceAlign() {
-        return forceAlign(WidthAlignment.CENTER, HeightAlignment.CENTER);
+        return forceAlign(DEFAULT_ALIGN_STRAT);
     }
 
-    public TableFormatter forceAlign(final WidthAlignment wAlign, final HeightAlignment hAlign) {
+    public TableFormatter forceAlign(final AlignmentStrategy alignStrat) {
         final String[][][] result = new String[rows][columns][];
         for (int i = 0; i < rows; ++i) {
             final int newHeight = rowMaxLength[i];
             for (int j = 0; j < columns; ++j) {
-                result[i][j] = this.table[i][j].forceAlign(newHeight, colMaxLength[j], hAlign, wAlign);
+                result[i][j] = this.table[i][j].forceAlign(newHeight, colMaxLength[j], alignStrat);
             }
         }
         return new TableFormatter(result, rowMaxLength, colMaxLength);
     }
 
     public void setCellFromText(int row, int col, String str) {
-        setCell(row, col, Cell.fromText(str));
+        setCell(row, col, new Cell(str != null ? str.split("\n") : new String[0]));
     }
 
     public void setCellFromLines(int row, int col, String... lines) {

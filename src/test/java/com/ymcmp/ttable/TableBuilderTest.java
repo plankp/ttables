@@ -12,6 +12,14 @@ import static org.junit.Assert.*;
 
 public class TableBuilderTest {
 
+    public static final AlignmentStrategy LEFT_CENTER_ALIGN = new AlignmentStrategy(
+            new com.ymcmp.ttable.width.LeftAlignmentStrategy(),
+            new com.ymcmp.ttable.height.CenterAlignmentStrategy());
+
+    public static final AlignmentStrategy RIGHT_CENTER_ALIGN = new AlignmentStrategy(
+            new com.ymcmp.ttable.width.RightAlignmentStrategy(),
+            new com.ymcmp.ttable.height.CenterAlignmentStrategy());
+
     private TableBuilder generateAlignedData() {
         final Map<String, String[]> data = new LinkedHashMap<>();
         data.put("Foo", new String[]{ "F", "o" });
@@ -19,13 +27,13 @@ public class TableBuilderTest {
         data.put("Baz", new String[]{ "z" });
         final TableBuilder fmt = TableUtils.fromMultimap(data, Arrays::asList);
 
-        fmt.getCell(1, 0).setPreferredAlignment(WidthAlignment.LEFT, HeightAlignment.CENTER);
-        fmt.getCell(2, 0).setPreferredAlignment(WidthAlignment.LEFT, HeightAlignment.CENTER);
-        fmt.getCell(3, 0).setPreferredAlignment(WidthAlignment.LEFT, HeightAlignment.CENTER);
+        fmt.getCell(1, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
+        fmt.getCell(2, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
+        fmt.getCell(3, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
 
-        fmt.getCell(1, 2).setPreferredAlignment(WidthAlignment.RIGHT, HeightAlignment.CENTER);
-        fmt.getCell(2, 2).setPreferredAlignment(WidthAlignment.RIGHT, HeightAlignment.CENTER);
-        fmt.getCell(3, 2).setPreferredAlignment(WidthAlignment.RIGHT, HeightAlignment.CENTER);
+        fmt.getCell(1, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
+        fmt.getCell(2, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
+        fmt.getCell(3, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
 
         return fmt;
     }
