@@ -13,20 +13,24 @@ public final class Cell {
     private char padding = ' ';
     private AlignmentStrategy preferred;
 
-    public void setText(String str) {
+    public Cell setText(String str) {
         this.lines = (str == null) ? EMPTY_STR_ARRAY : str.split("\n");
+        return this;
     }
 
-    public void setLines(String[] lines) {
+    public Cell setLines(String[] lines) {
         this.lines = (lines == null) ? EMPTY_STR_ARRAY : lines;
+        return this;
     }
 
-    public void setPreferredAlignment(AlignmentStrategy preferred) {
+    public Cell setPreferredAlignment(AlignmentStrategy preferred) {
         this.preferred = preferred;
+        return this;
     }
 
-    public void setPaddingChar(char padding) {
+    public Cell setPaddingChar(char padding) {
         this.padding = padding;
+        return this;
     }
 
     public int getLineCount() {

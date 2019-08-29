@@ -23,8 +23,8 @@ public class TableBuilderTest {
     private TableBuilder generateAlignedData() {
         final TableBuilder fmt = new TableBuilder(4, 3);
         fmt.getCell(0, 0).setText("Foo");
-        fmt.getCell(1, 0).setText("F");
-        fmt.getCell(2, 0).setText("o");
+        fmt.getCell(1, 0).setText("F").setPreferredAlignment(LEFT_CENTER_ALIGN);
+        fmt.getCell(2, 0).setText("o").setPreferredAlignment(LEFT_CENTER_ALIGN);
 
         fmt.getCell(0, 1).setText("Bar");
         fmt.getCell(1, 1).setText("B");
@@ -32,15 +32,7 @@ public class TableBuilderTest {
         fmt.getCell(3, 1).setText("r");
 
         fmt.getCell(0, 2).setText("Baz");
-        fmt.getCell(1, 2).setText("z");
-
-        fmt.getCell(1, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
-        fmt.getCell(2, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
-        fmt.getCell(3, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
-
-        fmt.getCell(1, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
-        fmt.getCell(2, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
-        fmt.getCell(3, 2).setPreferredAlignment(RIGHT_CENTER_ALIGN);
+        fmt.getCell(1, 2).setText("z").setPreferredAlignment(RIGHT_CENTER_ALIGN);
 
         return fmt;
     }
