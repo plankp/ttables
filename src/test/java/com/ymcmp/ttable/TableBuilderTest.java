@@ -68,4 +68,25 @@ public class TableBuilderTest {
                 " o   a     \n" +
                 "     r     " , fmt.forceAlign().toString());
     }
+
+    @Test
+    public void paddingCharacterCanBeChanged() {
+        final TableBuilder fmt = generateAlignedData();
+
+        fmt.getCell(1, 0).setPaddingChar('.');
+        fmt.getCell(2, 0).setPaddingChar('.');
+        fmt.getCell(3, 0).setPaddingChar('.');
+
+        fmt.getCell(2, 1).setPaddingChar('-');
+
+        fmt.getCell(3, 2).setPaddingChar('*');
+
+        assertEquals(4, fmt.rows);
+        assertEquals(3, fmt.columns);
+        assertEquals(
+                "Foo Bar Baz\n" +
+                ".F.  B   z \n" +
+                ".o. -a-    \n" +
+                "...  r  ***" , fmt.forceAlign().toString());
+    }
 }

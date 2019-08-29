@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 public final class Cell {
 
+    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+
     private final String[] lines;
 
+    private char padding = ' ';
     private AlignmentStrategy preferred;
 
     public Cell(String[] lines) {
@@ -16,6 +19,10 @@ public final class Cell {
 
     public void setPreferredAlignment(AlignmentStrategy preferred) {
         this.preferred = preferred;
+    }
+
+    public void setPaddingChar(char padding) {
+        this.padding = padding;
     }
 
     public int getLineCount() {
@@ -33,41 +40,33 @@ public final class Cell {
     }
 
     public String[] align(final int newHeight, final int newWidth, final AlignmentStrategy backupStrat) {
-        return alignHelper(newHeight, newWidth, this.lines, this.preferred != null ? this.preferred : backupStrat);
+        return forceAlign(newHeight, newWidth, this.preferred != null ? this.preferred : backupStrat);
     }
 
-    public String[] forceAlign(final int newHeight, final int newWidth, final AlignmentStrategy strat) {
-        return alignHelper(newHeight, newWidth, this.lines, strat);
-    }
-
-    private static String[] alignHelper(final int newHeight, final int newWidth, final String[] lines, final AlignmentStrategy strategy) {
+    public String[] forceAlign(final int newHeight, final int newWidth, final AlignmentStrategy strategy) {
         final String[] result = new String[newHeight];
-        final String fullPad = new String(repeatChars(newWidth, ' '));
+        final String fullPad = new String(repeatChars(newWidth, this.padding));
 
         // Align height
-        final int startHeight = strategy.getFirstLineOffset(lines.length, result.length);
+        final int startHeight = strategy.getFirstLineOffset(this.lines.length, result.length);
         Arrays.fill(result, 0, startHeight, fullPad);
-        Arrays.fill(result, startHeight + lines.length, result.length, fullPad);
+        Arrays.fill(result, startHeight + this.lines.length, result.length, fullPad);
 
         // Align width
         // Only process the region where there is actually text
-        for (int i = 0; i < lines.length; ++i) {
+        final StringBuilder buffer = new StringBuilder(newWidth);
+        for (int i = 0; i < this.lines.length; ++i) {
             final int height = startHeight + i;
 
-            final String line = lines[i];
+            final String line = this.lines[i];
             final int leftPadding = strategy.getFirstCharOffset(line.length(), newWidth);
             final int rightPadding = newWidth - line.length() - leftPadding;
 
-            if (leftPadding <= 0 && rightPadding <= 0) {
-                // No padding needed
-                result[height] = line;
-                continue;
-            }
-
-            result[height] = new StringBuilder(newWidth)
-                    .append(repeatChars(leftPadding, ' '))
+            buffer.setLength(0);
+            result[height] = buffer
+                    .append(repeatChars(leftPadding, this.padding))
                     .append(line)
-                    .append(repeatChars(rightPadding, ' '))
+                    .append(repeatChars(rightPadding, this.padding))
                     .toString();
         }
 
@@ -75,7 +74,11 @@ public final class Cell {
     }
 
     private static char[] repeatChars(int length, char unit) {
-        final char[] array = new char[Math.max(0, length)];
+        if (length <= 0) {
+            return EMPTY_CHAR_ARRAY;
+        }
+
+        final char[] array = new char[length];
         Arrays.fill(array, unit);
         return array;
     }
