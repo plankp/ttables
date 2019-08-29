@@ -29,36 +29,6 @@ public class TableBuilder {
         this.colMaxLength = new int[columns];
     }
 
-    public TableFormatter align() {
-        return align(DEFAULT_ALIGN_STRAT);
-    }
-
-    public TableFormatter align(final AlignmentStrategy alignStrat) {
-        final String[][][] result = new String[rows][columns][];
-        for (int i = 0; i < rows; ++i) {
-            final int newHeight = rowMaxLength[i];
-            for (int j = 0; j < columns; ++j) {
-                result[i][j] = this.table[i][j].align(newHeight, colMaxLength[j], alignStrat);
-            }
-        }
-        return new TableFormatter(result, rowMaxLength, colMaxLength);
-    }
-
-    public TableFormatter forceAlign() {
-        return forceAlign(DEFAULT_ALIGN_STRAT);
-    }
-
-    public TableFormatter forceAlign(final AlignmentStrategy alignStrat) {
-        final String[][][] result = new String[rows][columns][];
-        for (int i = 0; i < rows; ++i) {
-            final int newHeight = rowMaxLength[i];
-            for (int j = 0; j < columns; ++j) {
-                result[i][j] = this.table[i][j].forceAlign(newHeight, colMaxLength[j], alignStrat);
-            }
-        }
-        return new TableFormatter(result, rowMaxLength, colMaxLength);
-    }
-
     public void setCellFromText(int row, int col, String str) {
         setCell(row, col, new Cell(str != null ? str.split("\n") : new String[0]));
     }
@@ -68,6 +38,7 @@ public class TableBuilder {
     }
 
     public void setCell(int row, int col, Cell cell) {
+        if (cell == null) cell = new Cell(new String[0]);
         table[row][col] = cell;
 
         // Calculate max lengths
@@ -82,6 +53,44 @@ public class TableBuilder {
     }
 
     public Cell getCell(int row, int col) {
-        return table[row][col];
+        return this.ensureGetCell(row, col);
+    }
+
+    private Cell ensureGetCell(int row, int col) {
+        Cell cell = this.table[row][col];
+        if (cell == null) {
+            this.table[row][col] = cell = new Cell(new String[0]);
+        }
+        return cell;
+    }
+
+    public TableFormatter align() {
+        return align(DEFAULT_ALIGN_STRAT);
+    }
+
+    public TableFormatter align(final AlignmentStrategy alignStrat) {
+        final String[][][] result = new String[rows][columns][];
+        for (int i = 0; i < rows; ++i) {
+            final int newHeight = rowMaxLength[i];
+            for (int j = 0; j < columns; ++j) {
+                result[i][j] = this.ensureGetCell(i, j).align(newHeight, colMaxLength[j], alignStrat);
+            }
+        }
+        return new TableFormatter(result, rowMaxLength, colMaxLength);
+    }
+
+    public TableFormatter forceAlign() {
+        return forceAlign(DEFAULT_ALIGN_STRAT);
+    }
+
+    public TableFormatter forceAlign(final AlignmentStrategy alignStrat) {
+        final String[][][] result = new String[rows][columns][];
+        for (int i = 0; i < rows; ++i) {
+            final int newHeight = rowMaxLength[i];
+            for (int j = 0; j < columns; ++j) {
+                result[i][j] = this.ensureGetCell(i, j).forceAlign(newHeight, colMaxLength[j], alignStrat);
+            }
+        }
+        return new TableFormatter(result, rowMaxLength, colMaxLength);
     }
 }

@@ -21,11 +21,18 @@ public class TableBuilderTest {
             new com.ymcmp.ttable.height.CenterAlignmentStrategy());
 
     private TableBuilder generateAlignedData() {
-        final Map<String, String[]> data = new LinkedHashMap<>();
-        data.put("Foo", new String[]{ "F", "o" });
-        data.put("Bar", new String[]{ "B", "a", "r" });
-        data.put("Baz", new String[]{ "z" });
-        final TableBuilder fmt = TableUtils.fromMultimap(data, Arrays::asList);
+        final TableBuilder fmt = new TableBuilder(4, 3);
+        fmt.setCellFromText(0, 0, "Foo");
+        fmt.setCellFromText(1, 0, "F");
+        fmt.setCellFromText(2, 0, "o");
+
+        fmt.setCellFromText(0, 1, "Bar");
+        fmt.setCellFromText(1, 1, "B");
+        fmt.setCellFromText(2, 1, "a");
+        fmt.setCellFromText(3, 1, "r");
+
+        fmt.setCellFromText(0, 2, "Baz");
+        fmt.setCellFromText(1, 2, "z");
 
         fmt.getCell(1, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
         fmt.getCell(2, 0).setPreferredAlignment(LEFT_CENTER_ALIGN);
