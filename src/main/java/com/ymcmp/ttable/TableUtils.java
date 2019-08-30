@@ -8,8 +8,6 @@ import java.util.Collection;
 
 import java.util.function.Function;
 
-import com.ymcmp.ttable.border.Border;
-import com.ymcmp.ttable.border.Corner;
 import com.ymcmp.ttable.divider.DividerBuilder;
 
 public final class TableUtils {
@@ -127,14 +125,5 @@ public final class TableUtils {
             }
         }
         fmt.updateDivider(div.build());
-    }
-
-    public static void applyGridPerimeter(final TableFormatter fmt, final char horiz, final char vert, final char corner) {
-        final String sHoriz = Character.toString(horiz);
-        final String sVert  = Character.toString(vert);
-        final String sCross = Character.toString(corner);
-
-        fmt.updateBorder(new Border(sHoriz, sVert, sHoriz, sVert));
-        fmt.updateCorner(new Corner(sCross, sCross, sCross, sCross));
     }
 }

@@ -7,9 +7,6 @@ import java.util.LinkedHashMap;
 
 import org.junit.Test;
 
-import static com.ymcmp.ttable.border.Border.ASCII_BORDER;
-import static com.ymcmp.ttable.border.Corner.ASCII_CORNER;
-
 import static org.junit.Assert.*;
 
 public class TableUtilsTest {
@@ -95,17 +92,13 @@ public class TableUtilsTest {
         };
         final TableFormatter fmt = TableUtils.fromArray(data).align();
         TableUtils.applyGridDivider(fmt);
-        fmt.updateBorder(ASCII_BORDER);
-        fmt.updateCorner(ASCII_CORNER);
 
         assertEquals(
-                "+--------------+\n" +
-                "| A  | B |  C  |\n" +
-                "|----+---+-----|\n" +
-                "| 1  | 2 |  3  |\n" +
-                "|----+---+-----|\n" +
-                "|1.0 | q | null|\n" +
-                "+--------------+", fmt.toString());
+                " A  | B |  C  \n" +
+                "----+---+-----\n" +
+                " 1  | 2 |  3  \n" +
+                "----+---+-----\n" +
+                "1.0 | q | null", fmt.toString());
     }
 
     @Test

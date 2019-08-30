@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import java.util.stream.Collectors;
 
-import com.ymcmp.ttable.border.Border;
-import com.ymcmp.ttable.border.Corner;
 import com.ymcmp.ttable.divider.Divider;
 
 public class TableFormatter {
@@ -21,9 +19,6 @@ public class TableFormatter {
 
     private String cached = null;
 
-    private Border border = new Border();
-    private Corner corner = new Corner();
-
     private Divider divider = new Divider();
 
     public TableFormatter(String[][][] table, int[] rowMaxLength, int[] colMaxLength) {
@@ -33,16 +28,6 @@ public class TableFormatter {
 
         this.rows = rowMaxLength.length;
         this.columns = colMaxLength.length;
-    }
-
-    public void updateBorder(Border border) {
-        this.cached = null;
-        this.border = border == null ? new Border() : border;
-    }
-
-    public void updateCorner(Corner corner) {
-        this.cached = null;
-        this.corner = corner == null ? new Corner() : corner;
     }
 
     public void updateDivider(Divider divider) {
@@ -109,40 +94,6 @@ public class TableFormatter {
         }
     }
 
-    private String generateTopBorder(final int length) {
-        if (length < 1) {
-            return "";
-        }
-
-        final StringBuilder prefix = new StringBuilder();
-        if (!border.top.isEmpty()) {
-            while (prefix.length() < length) {
-                prefix.append(border.top);
-            }
-            prefix.insert(0, corner.topLeft).append(corner.topRight).append('\n');
-        }
-        prefix.append(border.left);
-
-        return prefix.toString();
-    }
-
-    private String generateBottomBorder(final int length) {
-        if (length < 1) {
-            return "";
-        }
-
-        final StringBuilder suffix = new StringBuilder();
-        if (!border.bottom.isEmpty()) {
-            while (suffix.length() < length) {
-                suffix.append(border.bottom);
-            }
-            suffix.insert(0, corner.bottomLeft).insert(0, '\n').append(corner.bottomRight);
-        }
-        suffix.insert(0, border.right);
-
-        return suffix.toString();
-    }
-
     @Override
     public String toString() {
         if (this.cached != null) {
@@ -153,13 +104,9 @@ public class TableFormatter {
 
         drawTable(lines);
 
-        final int padCount = lines.isEmpty() ? 0 : lines.get(0).length();
-        final String prefix = generateTopBorder(padCount);
-        final String suffix = generateBottomBorder(padCount);
-
         final String result = lines.stream()
                 .map(StringBuilder::toString)
-                .collect(Collectors.joining(border.right + '\n' + border.left, prefix, suffix));
+                .collect(Collectors.joining("\n"));
         this.cached = result;
         return result;
     }
