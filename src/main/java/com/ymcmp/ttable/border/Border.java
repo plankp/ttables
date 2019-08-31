@@ -37,6 +37,10 @@ public final class Border {
     }
 
 
+    public static Border fourCorners(Character tr, Character tl, Character br, Character bl) {
+        return new Border(null, null, null, null, tr, tl, br, bl);
+    }
+
     public boolean hasTopBorder() {
         return this.top != null
             || this.topRight != null
