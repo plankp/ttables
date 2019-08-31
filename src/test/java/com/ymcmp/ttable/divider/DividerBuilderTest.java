@@ -59,7 +59,6 @@ public class DividerBuilderTest {
         fmt.updateDivider(DividerBuilder
                 .unicodeGridTemplate(fmt.rows, fmt.columns)
                 .build());
-                System.out.println(fmt.toString());
         assertEquals(
                 " A  │ B │  C  \n" +
                 "────┼───┼─────\n" +
