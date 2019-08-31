@@ -7,6 +7,14 @@ public final class Border {
     public static final Border ASCII_BORDER = new Border(
             '-', '-', '|', '|', '+', '+', '+', '+');
 
+    public static final Border UNICODE_BORDER = new Border(
+            '\u2500', '\u2500', '\u2502', '\u2502',
+            '\u2510', '\u250C', '\u2518', '\u2514');
+
+    public static final Border BOX_BRACKET = new Border(
+            ' ', ' ', '\u2502', '\u2502',
+            '\u2510', '\u250C', '\u2518', '\u2514');
+
     private static final char DEFAULT_PADDING_CHAR = ' ';
 
     private final Character top;
