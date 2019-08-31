@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import java.util.stream.Collectors;
 
+import com.ymcmp.ttable.border.Border;
 import com.ymcmp.ttable.divider.Divider;
 
 public class TableFormatter {
@@ -19,6 +20,7 @@ public class TableFormatter {
 
     private String cached = null;
 
+    private Border border = new Border();
     private Divider divider = new Divider();
 
     public TableFormatter(String[][][] table, int[] rowMaxLength, int[] colMaxLength) {
@@ -28,6 +30,11 @@ public class TableFormatter {
 
         this.rows = rowMaxLength.length;
         this.columns = colMaxLength.length;
+    }
+
+    public void updateBorder(Border border) {
+        this.cached = null;
+        this.border = border == null ? new Border() : border;
     }
 
     public void updateDivider(Divider divider) {
@@ -104,10 +111,45 @@ public class TableFormatter {
 
         drawTable(lines);
 
+        final int padCount = lines.isEmpty() ? 0 : lines.get(0).length();
+        final String top = this.generateTopBorder(padCount);
+        final String bottom = this.generateBottomBorder(padCount);
+
         final String result = lines.stream()
                 .map(StringBuilder::toString)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining(this.generateDelimiter(), top, bottom));
         this.cached = result;
         return result;
+    }
+
+    private String generateTopBorder(final int length) {
+        final StringBuilder sb = new StringBuilder();
+        if (this.border.hasTopBorder()) {
+            sb.append(this.border.getTopLeftCorner())
+                    .append(this.border.getTopBar(length))
+                    .append(this.border.getTopRightCorner())
+                    .append('\n');
+        }
+
+        sb.append(this.border.getLeftBarElement());
+        return sb.toString();
+    }
+
+    private String generateBottomBorder(final int length) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.border.getRightBarElement());
+
+        if (this.border.hasBottomBorder()) {
+            sb.append('\n')
+                    .append(this.border.getBottomLeftCorner())
+                    .append(this.border.getBottomBar(length))
+                    .append(this.border.getBottomRightCorner());
+        }
+        return sb.toString();
+    }
+
+    private String generateDelimiter() {
+        return this.border.getRightBarElement() + '\n'
+                + this.border.getLeftBarElement();
     }
 }

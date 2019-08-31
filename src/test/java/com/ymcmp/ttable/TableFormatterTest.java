@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+import com.ymcmp.ttable.border.Border;
 import com.ymcmp.ttable.divider.DividerBuilder;
 
 import org.junit.Test;
@@ -44,5 +45,23 @@ public class TableFormatterTest {
                 " F  |  B  |  z \n" +
                 " o  |  a  |    \n" +
                 "    |  r  |    " , fmt.toString());
+    }
+
+    @Test
+    public void borderAreAppliedCorrectly() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+        fmt.updateBorder(new Border('*', '-', '|', '/', '#', '@', '+', ' '));
+
+        assertEquals(
+                "@**********#\n" +
+                "/ A  B  C  |\n" +
+                "/ 1  2  3  |\n" +
+                "/1.0 q null|\n" +
+                " ----------+", fmt.toString());
     }
 }
