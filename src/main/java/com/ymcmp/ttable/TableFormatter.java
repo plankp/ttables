@@ -1,7 +1,7 @@
 package com.ymcmp.ttable;
 
 import java.util.Arrays;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import java.util.stream.Collectors;
 
@@ -51,105 +51,129 @@ public class TableFormatter {
         return Arrays.stream(table[row][col]).collect(Collectors.joining("\n"));
     }
 
-    private void drawTable(final ArrayList<StringBuilder> lines) {
-        for (int i = 0, offset = 0, start = 0; i < rows; ++i) {
-            lines.add(new StringBuilder());
-            final int rowDivIdx = rowMaxLength[i];
-            for (int j = 0; j < columns; ++j) {
-                final String[] cell = table[i][j];
-                final int rowDiv = divider.getRowDivider(i);
-                final int colDiv = divider.getColumnDivider(j);
-                final int bound = cell.length + (rowDiv >= 0 ? 1 : 0);
-                if (j == 0) {
-                    start += bound;
-                }
-
-                for (int k = 0, save = offset; k < bound; ++k, ++save) {
-                    while (lines.size() <= save) {
-                        lines.add(new StringBuilder());
-                    }
-
-                    final StringBuilder sb = lines.get(save);
-                    if (k == rowDivIdx) {
-                        final char[] div = new char[colMaxLength[j]];
-                        Arrays.fill(div, (char) rowDiv);
-                        sb.append(div);
-                    } else {
-                        sb.append(cell[k]);
-
-                        if (colDiv >= 0) {
-                            sb.append(' ').append((char) colDiv);
-                        }
-                    }
-
-                    if (j + 1 != columns) {
-                        if (k == rowDivIdx) {
-                            final char c = (char) rowDiv;
-                            sb.append(c);
-                            if (colDiv >= 0) {
-                                sb.append(getJunctionOrDefault(i, j, c));
-                                sb.append(c);
-                            }
-                        } else {
-                            sb.append(' ');
-                        }
-                    }
-                }
-            }
-
-            offset = start;
-        }
-    }
-
     @Override
     public String toString() {
         if (this.cached != null) {
             return this.cached;
         }
 
-        final ArrayList<StringBuilder> lines = new ArrayList<>(rows);
-
-        drawTable(lines);
-
-        final int padCount = lines.isEmpty() ? 0 : lines.get(0).length();
-        final String top = this.generateTopBorder(padCount);
-        final String bottom = this.generateBottomBorder(padCount);
-
-        final String result = lines.stream()
-                .map(StringBuilder::toString)
-                .collect(Collectors.joining(this.generateDelimiter(), top, bottom));
+        final String result = this.generateTable();
         this.cached = result;
         return result;
     }
 
-    private String generateTopBorder(final int length) {
-        final StringBuilder sb = new StringBuilder();
+    private String generateTable() {
+        final LinkedList<String> logicalLines = new LinkedList<>();
+
         if (this.border.hasTopBorder()) {
-            sb.append(this.border.getTopLeftCorner())
-                    .append(this.border.getTopBar(length))
-                    .append(this.border.getTopRightCorner())
-                    .append('\n');
+            logicalLines.add(this.generateTopBorder());
         }
 
-        sb.append(this.border.getLeftBarElement());
-        return sb.toString();
-    }
+        for (int i = 0; i < this.rows; ++i) {
+            logicalLines.add(this.generateRow(i));
 
-    private String generateBottomBorder(final int length) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(this.border.getRightBarElement());
+            final String divider = this.generateHorizontalDivider(i);
+            if (divider != null) {
+                logicalLines.add(divider);
+            }
+        }
 
         if (this.border.hasBottomBorder()) {
-            sb.append('\n')
-                    .append(this.border.getBottomLeftCorner())
-                    .append(this.border.getBottomBar(length))
-                    .append(this.border.getBottomRightCorner());
+            logicalLines.add(this.generateBottomBorder());
         }
+
+        return logicalLines.stream()
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String generateRow(int rowIdx) {
+        final String[][] row = this.table[rowIdx];
+        final StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < this.rowMaxLength[rowIdx]; ++i) {
+            sb.append(this.border.getLeftBarElement());
+
+            for (int j = 0; j < this.columns; ++j) {
+                final String[] cellLines = row[j];
+                sb.append(cellLines[i]).append(' ');
+
+                final int colDiv = this.divider.getColumnDivider(j);
+                if (colDiv >= 0) {
+                    sb.append((char) colDiv).append(' ');
+                }
+            }
+
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append(this.border.getRightBarElement()).append('\n');
+        }
+
+        final int len = sb.length();
+        if (len > 0) {
+            sb.deleteCharAt(len - 1);
+        }
+
         return sb.toString();
     }
 
-    private String generateDelimiter() {
-        return this.border.getRightBarElement() + '\n'
-                + this.border.getLeftBarElement();
+    private String generateHorizontalDivider(int rowIdx) {
+        final int rowDiv = this.divider.getRowDivider(rowIdx);
+        if (rowDiv < 0) {
+            return null;
+        }
+
+        final char rowDivCh = (char) rowDiv;
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(this.border.getLeftBarElement());
+
+        for (int j = 0; j < this.columns; ++j) {
+            final char[] bottomLine = new char[this.colMaxLength[j] + 1];
+            Arrays.fill(bottomLine, rowDivCh);
+            sb.append(bottomLine);
+
+            final int colDiv = this.divider.getColumnDivider(j);
+            if (colDiv >= 0) {
+                sb.append(this.getJunctionOrDefault(rowIdx, j, rowDivCh)).append(rowDivCh);
+            }
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(this.border.getRightBarElement());
+
+        return sb.toString();
+    }
+
+    private String generateTopBorder() {
+        final StringBuilder sb = new StringBuilder();
+
+        int padWidth = 0;
+        for (int j = 0; j < this.columns; ++j) {
+            padWidth += this.colMaxLength[j] + 1;
+            if (this.divider.getColumnDivider(j) >= 0) {
+                padWidth += 2;
+            }
+        }
+
+        padWidth -= 1;
+        return this.border.getTopLeftCorner()
+                + this.border.getTopBar(padWidth)
+                + this.border.getTopRightCorner();
+    }
+
+    private String generateBottomBorder() {
+        final StringBuilder sb = new StringBuilder();
+
+        int padWidth = 0;
+        for (int j = 0; j < this.columns; ++j) {
+            padWidth += this.colMaxLength[j] + 1;
+            if (this.divider.getColumnDivider(j) >= 0) {
+                padWidth += 2;
+            }
+        }
+
+        padWidth -= 1;
+        return this.border.getBottomLeftCorner()
+                + this.border.getBottomBar(padWidth)
+                + this.border.getBottomRightCorner();
     }
 }
