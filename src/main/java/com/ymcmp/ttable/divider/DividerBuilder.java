@@ -19,6 +19,20 @@ public class DividerBuilder {
         return gridDividerTemplate(rowCount, columnCount, '-', '|', '+');
     }
 
+    public static DividerBuilder unicodeGridTemplate(int rowCount, int columnCount) {
+        final DividerBuilder div = gridDividerTemplate(rowCount, columnCount, '\u2500', '\u2502', '\u253c');
+
+        for (int i = 0; i < rowCount; ++i) {
+            div.addJunction(i, -1, '\u251c');
+            div.addJunction(i, columnCount, '\u2524');
+        }
+        for (int j = 0; j < columnCount; ++j) {
+            div.addJunction(-1, j, '\u252c');
+            div.addJunction(rowCount, j, '\u2534');
+        }
+        return div;
+    }
+
     public static DividerBuilder gridDividerTemplate(int rowCount, int columnCount, final char row, final char col, final char intersect) {
         final DividerBuilder div = new DividerBuilder();
 

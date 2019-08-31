@@ -86,64 +86,6 @@ public class TableUtilsTest {
     }
 
     @Test
-    public void gridsAreAppliedCorrectly() {
-        final Object[][] data = {
-            {"A", "B", "C"},
-            {1, 2, 3},
-            {1.0, 'q', null}
-        };
-        final TableFormatter fmt = TableUtils.fromArray(data).align();
-
-        TableUtils.applyGridDivider(fmt);
-        assertEquals(
-                " A  | B |  C  \n" +
-                "----+---+-----\n" +
-                " 1  | 2 |  3  \n" +
-                "----+---+-----\n" +
-                "1.0 | q | null", fmt.toString());
-
-        fmt.updateBorder(ASCII_BORDER);
-        assertEquals(
-                "+--------------+\n" +
-                "| A  | B |  C  |\n" +
-                "|----+---+-----|\n" +
-                "| 1  | 2 |  3  |\n" +
-                "|----+---+-----|\n" +
-                "|1.0 | q | null|\n" +
-                "+--------------+", fmt.toString());
-    }
-
-    @Test
-    public void dividersAreAppliedForHorizontalTables() {
-        final Object[][] data = {
-            {"A", "B", "C"},
-        };
-        final TableFormatter fmt = TableUtils.fromArray(data).align();
-        TableUtils.applyGridDivider(fmt);
-
-        assertEquals(
-                "A | B | C", fmt.toString());
-    }
-
-    @Test
-    public void dividersAreAppliedForVerticalTables() {
-        final Object[][] data = {
-            {"A"},
-            {"B"},
-            {"C"},
-        };
-        final TableFormatter fmt = TableUtils.fromArray(data).align();
-        TableUtils.applyGridDivider(fmt);
-
-        assertEquals(
-                "A\n" +
-                "-\n" +
-                "B\n" +
-                "-\n" +
-                "C", fmt.toString());
-    }
-
-    @Test
     public void fromTableHasDataAsRows() {
         final Person joe = new Person("Joe", 20, false);
         final Person leo = new Person("Leo", 19, true);
