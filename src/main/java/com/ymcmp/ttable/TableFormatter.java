@@ -47,6 +47,11 @@ public class TableFormatter {
         return ch >= 0 ? (char) ch : defaultChar;
     }
 
+    private String getJunctionOrDefault(int row, int col, String defaultStr) {
+        final int ch = divider.getJunctionDivider(row, col);
+        return ch >= 0 ? Character.toString((char) ch) : defaultStr;
+    }
+
     public String getCell(int row, int col) {
         return Arrays.stream(table[row][col]).collect(Collectors.joining("\n"));
     }
@@ -130,7 +135,7 @@ public class TableFormatter {
     private String generateHorizontalLine(int rowIdx, String leftElement, char barElement, String rightElement) {
         final StringBuilder sb = new StringBuilder();
 
-        sb.append(leftElement);
+        sb.append(this.getJunctionOrDefault(rowIdx, -1, leftElement));
 
         for (int j = 0; j < this.columns; ++j) {
             final int limit = this.colMaxLength[j] + 1;
@@ -144,7 +149,7 @@ public class TableFormatter {
         }
 
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(rightElement);
+        sb.append(this.getJunctionOrDefault(rowIdx, this.columns, rightElement));
 
         return sb.toString();
     }

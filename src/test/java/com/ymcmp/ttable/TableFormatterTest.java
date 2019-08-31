@@ -9,6 +9,8 @@ import com.ymcmp.ttable.divider.DividerBuilder;
 
 import org.junit.Test;
 
+import static com.ymcmp.ttable.border.Border.ASCII_BORDER;
+
 import static org.junit.Assert.*;
 
 public class TableFormatterTest {
@@ -36,8 +38,25 @@ public class TableFormatterTest {
                 " F  |  B   z \n" +
                 " o  |  a     \n" +
                 "    |  r     " , fmt.toString());
+    }
 
-        div.addColumn(1, '|');
+    @Test
+    public void rowDividerAsDefaultJunctionPoint() {
+        final Map<String, String[]> data = new LinkedHashMap<>();
+        data.put("Foo", new String[]{ "F", "o" });
+        data.put("Bar", new String[]{ "B", "a", "r" });
+        data.put("Baz", new String[]{ "z" });
+        final TableBuilder builder = TableUtils.fromMultimap(data, Arrays::asList);
+        final TableFormatter fmt = builder.align();
+
+        assertEquals(4, fmt.rows);
+        assertEquals(3, fmt.columns);
+
+        final DividerBuilder div = new DividerBuilder()
+                .addRow(0, '-')
+                .addColumn(0, '|')
+                .addJunction(0, 0, '+')
+                .addColumn(1, '|');
         fmt.updateDivider(div.build());
         assertEquals(
                 "Foo | Bar | Baz\n" +
@@ -45,6 +64,39 @@ public class TableFormatterTest {
                 " F  |  B  |  z \n" +
                 " o  |  a  |    \n" +
                 "    |  r  |    " , fmt.toString());
+    }
+
+    @Test
+    public void specialJunctionPointsAreSupported() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+        fmt.updateBorder(ASCII_BORDER);
+
+        final DividerBuilder div = DividerBuilder
+                .gridDividerTemplate(fmt.rows, fmt.columns)
+                .addJunction(-1, 0, '+')
+                .addJunction(-1, 1, '*')
+                .addJunction(3, 0, '!')
+                .addJunction(3, 1, '@')
+                .addJunction(0, -1, '=')
+                .addJunction(1, -1, '<')
+                .addJunction(0, 3, '>')
+                .addJunction(1, 3, '~');
+
+        fmt.updateDivider(div.build());
+
+        assertEquals(
+                "+----+---*-----+\n" +
+                "| A  | B |  C  |\n" +
+                "=----+---+----->\n" +
+                "| 1  | 2 |  3  |\n" +
+                "<----+---+-----~\n" +
+                "|1.0 | q | null|\n" +
+                "+----!---@-----+", fmt.toString());
     }
 
     @Test
