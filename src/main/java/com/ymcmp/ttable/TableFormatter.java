@@ -93,7 +93,7 @@ public class TableFormatter {
 
         if (this.border.hasBottomBorder()) {
             logicalLines.add(this.generateHorizontalLine(
-                    this.columns,
+                    this.rows,
                     this.border.getBottomLeftCorner(),
                     this.border.getBottomBarElement(),
                     this.border.getBottomRightCorner()));
