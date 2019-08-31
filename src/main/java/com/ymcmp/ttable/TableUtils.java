@@ -8,8 +8,6 @@ import java.util.Collection;
 
 import java.util.function.Function;
 
-import com.ymcmp.ttable.divider.DividerBuilder;
-
 public final class TableUtils {
 
     private TableUtils() {
@@ -107,17 +105,5 @@ public final class TableUtils {
         }
 
         return fmt;
-    }
-
-    public static void applyGridDivider(TableFormatter fmt) {
-        fmt.updateDivider(DividerBuilder
-                .asciiGridTemplate(fmt.rows, fmt.columns)
-                .build());
-    }
-
-    public static void applyGridDivider(final TableFormatter fmt, final char row, final char col, final char intersect) {
-        fmt.updateDivider(DividerBuilder
-                .gridDividerTemplate(fmt.rows, fmt.columns, row, col, intersect)
-                .build());
     }
 }
