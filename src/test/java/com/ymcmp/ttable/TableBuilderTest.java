@@ -12,9 +12,17 @@ import static org.junit.Assert.*;
 
 public class TableBuilderTest {
 
+    public static final AlignmentStrategy LEFT_TOP_ALIGN = new AlignmentStrategy(
+            new com.ymcmp.ttable.width.LeftAlignmentStrategy(),
+            new com.ymcmp.ttable.height.TopAlignmentStrategy());
+
     public static final AlignmentStrategy LEFT_CENTER_ALIGN = new AlignmentStrategy(
             new com.ymcmp.ttable.width.LeftAlignmentStrategy(),
             new com.ymcmp.ttable.height.CenterAlignmentStrategy());
+
+    public static final AlignmentStrategy LEFT_BOTTOM_ALIGN = new AlignmentStrategy(
+            new com.ymcmp.ttable.width.LeftAlignmentStrategy(),
+            new com.ymcmp.ttable.height.BottomAlignmentStrategy());
 
     public static final AlignmentStrategy RIGHT_CENTER_ALIGN = new AlignmentStrategy(
             new com.ymcmp.ttable.width.RightAlignmentStrategy(),
@@ -80,5 +88,43 @@ public class TableBuilderTest {
                 ".F.  B   z \n" +
                 ".o. -a-    \n" +
                 "...  r  ***" , fmt.forceAlign().toString());
+    }
+
+    @Test
+    public void testHeightAlignments() {
+        final TableBuilder table = new TableBuilder(3, 2);
+
+        table.getCell(0, 0).setText("Top").setPreferredAlignment(LEFT_TOP_ALIGN);
+        table.getCell(1, 0).setText("Center").setPreferredAlignment(LEFT_CENTER_ALIGN);
+        table.getCell(2, 0).setText("Bottom").setPreferredAlignment(LEFT_BOTTOM_ALIGN);
+
+        final String[] lines = {
+            "Lorem ipsum dolor sit amet,",
+            "consectetur adipiscing elit,",
+            "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...",
+        };
+        table.getCell(0, 1).setLines(lines).setPreferredAlignment(RIGHT_CENTER_ALIGN);
+        table.getCell(1, 1).setLines(lines);
+        table.getCell(2, 1).setLines(lines).setPreferredAlignment(LEFT_CENTER_ALIGN);
+
+        final TableFormatter fmt = table.align();
+        fmt.updateDivider(new DividerBuilder()
+                .addRow(0, '-').addRow(1, '-')
+                .addColumn(0, '|')
+                .addJunction(0, 0, '|').addJunction(1, 0, '|')
+                .build());
+
+        assertEquals(
+                "Top    |                                          Lorem ipsum dolor sit amet,\n" +
+                "       |                                         consectetur adipiscing elit,\n" +
+                "       | sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...\n" +
+                "-------|---------------------------------------------------------------------\n" +
+                "       |                     Lorem ipsum dolor sit amet,                     \n" +
+                "Center |                     consectetur adipiscing elit,                    \n" +
+                "       | sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...\n" +
+                "-------|---------------------------------------------------------------------\n" +
+                "       | Lorem ipsum dolor sit amet,                                         \n" +
+                "       | consectetur adipiscing elit,                                        \n" +
+                "Bottom | sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...", fmt.toString());
     }
 }
