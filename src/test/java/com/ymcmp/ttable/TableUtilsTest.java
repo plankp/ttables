@@ -102,6 +102,36 @@ public class TableUtilsTest {
     }
 
     @Test
+    public void dividersAreAppliedForHorizontalTables() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+        TableUtils.applyGridDivider(fmt);
+
+        assertEquals(
+                "A | B | C", fmt.toString());
+    }
+
+    @Test
+    public void dividersAreAppliedForVerticalTables() {
+        final Object[][] data = {
+            {"A"},
+            {"B"},
+            {"C"},
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+        TableUtils.applyGridDivider(fmt);
+
+        assertEquals(
+                "A\n" +
+                "-\n" +
+                "B\n" +
+                "-\n" +
+                "C", fmt.toString());
+    }
+
+    @Test
     public void fromTableHasDataAsRows() {
         final Person joe = new Person("Joe", 20, false);
         final Person leo = new Person("Leo", 19, true);

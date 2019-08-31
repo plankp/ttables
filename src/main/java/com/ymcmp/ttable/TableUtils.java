@@ -115,15 +115,18 @@ public final class TableUtils {
 
     public static void applyGridDivider(final TableFormatter fmt, final char row, final char col, final char intersect) {
         final DividerBuilder div = new DividerBuilder();
+
+        for (int i = 0; i < fmt.columns - 1; ++i) {
+            div.addColumn(i, col);
+        }
+
         for (int i = 0; i < fmt.rows - 1; ++i) {
             div.addRow(i, row);
             for (int j = 0; j < fmt.columns - 1; ++j) {
-                if (i == 0) {
-                    div.addColumn(j, col);
-                }
                 div.addJunction(i, j, intersect);
             }
         }
+
         fmt.updateDivider(div.build());
     }
 }
