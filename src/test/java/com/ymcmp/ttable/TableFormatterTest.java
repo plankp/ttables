@@ -66,6 +66,68 @@ public class TableFormatterTest {
     }
 
     @Test
+    public void spaceIsNotPaddedIfOnlyTwoParallelBarsExists() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+
+        fmt.updateBorder(Border.fourBars('*', '-', null, null));
+        assertEquals(
+                "**********\n" +
+                " A  B  C  \n" +
+                " 1  2  3  \n" +
+                "1.0 q null\n" +
+                "----------", fmt.toString());
+
+        fmt.updateBorder(Border.fourBars(null, null, '-', '|'));
+        assertEquals(
+                "| A  B  C  -\n" +
+                "| 1  2  3  -\n" +
+                "|1.0 q null-", fmt.toString());
+    }
+
+    @Test
+    public void spaceIsPaddedIfTwoAdjacentBarsExists() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+
+        fmt.updateBorder(Border.fourBars('*', null, null, '|'));
+        assertEquals(
+                " **********\n" +
+                "| A  B  C  \n" +
+                "| 1  2  3  \n" +
+                "|1.0 q null", fmt.toString());
+
+        fmt.updateBorder(Border.fourBars('*', null, '|', null));
+        assertEquals(
+                "********** \n" +
+                " A  B  C  |\n" +
+                " 1  2  3  |\n" +
+                "1.0 q null|", fmt.toString());
+
+        fmt.updateBorder(Border.fourBars(null, '*', '-', null));
+        assertEquals(
+                " A  B  C  -\n" +
+                " 1  2  3  -\n" +
+                "1.0 q null-\n" +
+                "********** ", fmt.toString());
+
+        fmt.updateBorder(Border.fourBars(null, '*', null, '-'));
+        assertEquals(
+                "- A  B  C  \n" +
+                "- 1  2  3  \n" +
+                "-1.0 q null\n" +
+                " **********", fmt.toString());
+    }
+
+    @Test
     public void spaceIsPaddedIfOnlyThreeCornersExists() {
         final Object[][] data = {
             {"A", "B", "C"},
