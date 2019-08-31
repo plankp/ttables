@@ -66,20 +66,32 @@ public class TableFormatter {
         final LinkedList<String> logicalLines = new LinkedList<>();
 
         if (this.border.hasTopBorder()) {
-            logicalLines.add(this.generateTopBorder());
+            logicalLines.add(this.generateHorizontalLine(
+                    -1,
+                    this.border.getTopLeftCorner(),
+                    this.border.getTopBarElement(),
+                    this.border.getTopRightCorner()));
         }
 
         for (int i = 0; i < this.rows; ++i) {
             logicalLines.add(this.generateRow(i));
 
-            final String divider = this.generateHorizontalDivider(i);
-            if (divider != null) {
-                logicalLines.add(divider);
+            final int rowDiv = this.divider.getRowDivider(i);
+            if (rowDiv >= 0) {
+                logicalLines.add(this.generateHorizontalLine(
+                        i,
+                        this.border.getLeftBarElement(),
+                        (char) rowDiv,
+                        this.border.getRightBarElement()));
             }
         }
 
         if (this.border.hasBottomBorder()) {
-            logicalLines.add(this.generateBottomBorder());
+            logicalLines.add(this.generateHorizontalLine(
+                    this.columns,
+                    this.border.getBottomLeftCorner(),
+                    this.border.getBottomBarElement(),
+                    this.border.getBottomRightCorner()));
         }
 
         return logicalLines.stream()
@@ -115,65 +127,25 @@ public class TableFormatter {
         return sb.toString();
     }
 
-    private String generateHorizontalDivider(int rowIdx) {
-        final int rowDiv = this.divider.getRowDivider(rowIdx);
-        if (rowDiv < 0) {
-            return null;
-        }
-
-        final char rowDivCh = (char) rowDiv;
+    private String generateHorizontalLine(int rowIdx, String leftElement, char barElement, String rightElement) {
         final StringBuilder sb = new StringBuilder();
 
-        sb.append(this.border.getLeftBarElement());
+        sb.append(leftElement);
 
         for (int j = 0; j < this.columns; ++j) {
-            final char[] bottomLine = new char[this.colMaxLength[j] + 1];
-            Arrays.fill(bottomLine, rowDivCh);
-            sb.append(bottomLine);
+            final int limit = this.colMaxLength[j] + 1;
+            for (int i = 0; i < limit; ++i) {
+                sb.append(barElement);
+            }
 
-            final int colDiv = this.divider.getColumnDivider(j);
-            if (colDiv >= 0) {
-                sb.append(this.getJunctionOrDefault(rowIdx, j, rowDivCh)).append(rowDivCh);
+            if (this.divider.getColumnDivider(j) >= 0) {
+                sb.append(this.getJunctionOrDefault(rowIdx, j, barElement)).append(barElement);
             }
         }
 
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(this.border.getRightBarElement());
+        sb.append(rightElement);
 
         return sb.toString();
-    }
-
-    private String generateTopBorder() {
-        final StringBuilder sb = new StringBuilder();
-
-        int padWidth = 0;
-        for (int j = 0; j < this.columns; ++j) {
-            padWidth += this.colMaxLength[j] + 1;
-            if (this.divider.getColumnDivider(j) >= 0) {
-                padWidth += 2;
-            }
-        }
-
-        padWidth -= 1;
-        return this.border.getTopLeftCorner()
-                + this.border.getTopBar(padWidth)
-                + this.border.getTopRightCorner();
-    }
-
-    private String generateBottomBorder() {
-        final StringBuilder sb = new StringBuilder();
-
-        int padWidth = 0;
-        for (int j = 0; j < this.columns; ++j) {
-            padWidth += this.colMaxLength[j] + 1;
-            if (this.divider.getColumnDivider(j) >= 0) {
-                padWidth += 2;
-            }
-        }
-
-        padWidth -= 1;
-        return this.border.getBottomLeftCorner()
-                + this.border.getBottomBar(padWidth)
-                + this.border.getBottomRightCorner();
     }
 }

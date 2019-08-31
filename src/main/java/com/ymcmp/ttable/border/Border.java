@@ -58,12 +58,11 @@ public final class Border {
             || this.topLeft != null;
     }
 
-    public String getTopBar(int spanWidth) {
+    public Character getTopBarElement() {
         if (this.hasTopBorder()) {
-            return repeatPattern(spanWidth,
-                    this.top != null ? this.top : DEFAULT_PADDING_CHAR);
+            return this.top != null ? this.top : DEFAULT_PADDING_CHAR;
         }
-        return "";
+        return null;
     }
 
     public boolean hasBottomBorder() {
@@ -72,22 +71,11 @@ public final class Border {
             || this.bottomLeft != null;
     }
 
-    public String getBottomBar(int spanWidth) {
+    public Character getBottomBarElement() {
         if (this.hasBottomBorder()) {
-            return repeatPattern(spanWidth,
-                    this.bottom != null ? this.bottom : DEFAULT_PADDING_CHAR);
+            return this.bottom != null ? this.bottom : DEFAULT_PADDING_CHAR;
         }
-        return "";
-    }
-
-    private static String repeatPattern(int spanWidth, char pattern) {
-        if (spanWidth <= 0) {
-            return "";
-        }
-
-        final char[] array = new char[spanWidth];
-        Arrays.fill(array, pattern);
-        return String.valueOf(array);
+        return null;
     }
 
     public boolean hasRightBorder() {
