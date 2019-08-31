@@ -110,23 +110,14 @@ public final class TableUtils {
     }
 
     public static void applyGridDivider(TableFormatter fmt) {
-        applyGridDivider(fmt, '-', '|', '+');
+        fmt.updateDivider(DividerBuilder
+                .gridDividerTemplate(fmt.rows, fmt.columns)
+                .build());
     }
 
     public static void applyGridDivider(final TableFormatter fmt, final char row, final char col, final char intersect) {
-        final DividerBuilder div = new DividerBuilder();
-
-        for (int i = 0; i < fmt.columns - 1; ++i) {
-            div.addColumn(i, col);
-        }
-
-        for (int i = 0; i < fmt.rows - 1; ++i) {
-            div.addRow(i, row);
-            for (int j = 0; j < fmt.columns - 1; ++j) {
-                div.addJunction(i, j, intersect);
-            }
-        }
-
-        fmt.updateDivider(div.build());
+        fmt.updateDivider(DividerBuilder
+                .gridDividerTemplate(fmt.rows, fmt.columns, row, col, intersect)
+                .build());
     }
 }

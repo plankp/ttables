@@ -15,6 +15,27 @@ public class DividerBuilder {
         this.cross = new HashMap<>();
     }
 
+    public static DividerBuilder gridDividerTemplate(int rowCount, int columnCount) {
+        return gridDividerTemplate(rowCount, columnCount, '-', '|', '+');
+    }
+
+    public static DividerBuilder gridDividerTemplate(int rowCount, int columnCount, final char row, final char col, final char intersect) {
+        final DividerBuilder div = new DividerBuilder();
+
+        for (int i = 0; i < columnCount - 1; ++i) {
+            div.addColumn(i, col);
+        }
+
+        for (int i = 0; i < rowCount - 1; ++i) {
+            div.addRow(i, row);
+            for (int j = 0; j < columnCount - 1; ++j) {
+                div.addJunction(i, j, intersect);
+            }
+        }
+
+        return div;
+    }
+
     public Divider build() {
         return new Divider(
                 new HashMap<>(rows), new HashMap<>(cols), new HashMap<>(cross));
