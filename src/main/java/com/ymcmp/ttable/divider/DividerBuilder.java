@@ -15,7 +15,7 @@ public class DividerBuilder {
         this.cross = new HashMap<>();
     }
 
-    public static DividerBuilder gridDividerTemplate(int rowCount, int columnCount) {
+    public static DividerBuilder asciiGridTemplate(int rowCount, int columnCount) {
         return gridDividerTemplate(rowCount, columnCount, '-', '|', '+');
     }
 

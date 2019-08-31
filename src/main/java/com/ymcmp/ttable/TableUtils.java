@@ -111,7 +111,7 @@ public final class TableUtils {
 
     public static void applyGridDivider(TableFormatter fmt) {
         fmt.updateDivider(DividerBuilder
-                .gridDividerTemplate(fmt.rows, fmt.columns)
+                .asciiGridTemplate(fmt.rows, fmt.columns)
                 .build());
     }
 

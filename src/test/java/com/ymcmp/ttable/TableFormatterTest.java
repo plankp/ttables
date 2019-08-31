@@ -77,7 +77,7 @@ public class TableFormatterTest {
         fmt.updateBorder(ASCII_BORDER);
 
         final DividerBuilder div = DividerBuilder
-                .gridDividerTemplate(fmt.rows, fmt.columns)
+                .asciiGridTemplate(fmt.rows, fmt.columns)
                 .addJunction(-1, 0, '+')
                 .addJunction(-1, 1, '*')
                 .addJunction(3, 0, '!')
