@@ -24,6 +24,7 @@ public class TableFormatter {
     private Divider divider = new Divider();
 
     private boolean confSpacingAroundColumnDivider = true;
+    private boolean confFillRowDividerAtJunction = true;
 
     public TableFormatter(String[][][] table, int[] rowMaxLength, int[] colMaxLength) {
         this.table = table;
@@ -47,6 +48,11 @@ public class TableFormatter {
     public void shouldPlaceSpacingAroundColumnDivider(boolean flag) {
         this.cached = null;
         this.confSpacingAroundColumnDivider = flag;
+    }
+
+    public void shouldPickRowOverColumnDividerAtJunctions(boolean flag) {
+        this.cached = null;
+        this.confFillRowDividerAtJunction = flag;
     }
 
     private char getJunctionOrDefault(int row, int col, char defaultChar) {
@@ -162,12 +168,14 @@ public class TableFormatter {
                 sb.append(barElement);
             }
 
-            if (this.divider.getColumnDivider(j) >= 0) {
+            final int colDiv = this.divider.getColumnDivider(j);
+            if (colDiv >= 0) {
                 if (!this.confSpacingAroundColumnDivider) {
                     sb.deleteCharAt(sb.length() - 1);
                 }
 
-                sb.append(this.getJunctionOrDefault(rowIdx, j, barElement));
+                sb.append(this.getJunctionOrDefault(rowIdx, j,
+                        this.confFillRowDividerAtJunction ? barElement : (char) colDiv));
 
                 if (this.confSpacingAroundColumnDivider) {
                     sb.append(barElement);

@@ -67,6 +67,33 @@ public class TableFormatterTest {
     }
 
     @Test
+    public void columnDividerAsOptionalJunctionPoint() {
+        final Map<String, String[]> data = new LinkedHashMap<>();
+        data.put("Foo", new String[]{ "F", "o" });
+        data.put("Bar", new String[]{ "B", "a", "r" });
+        data.put("Baz", new String[]{ "z" });
+        final TableBuilder builder = TableUtils.fromMultimap(data, Arrays::asList);
+        final TableFormatter fmt = builder.align();
+
+        assertEquals(4, fmt.rows);
+        assertEquals(3, fmt.columns);
+
+        final DividerBuilder div = new DividerBuilder()
+                .addRow(0, '-')
+                .addColumn(0, '|')
+                .addJunction(0, 0, '+')
+                .addColumn(1, '|');
+        fmt.shouldPickRowOverColumnDividerAtJunctions(false);
+        fmt.updateDivider(div.build());
+        assertEquals(
+                "Foo | Bar | Baz\n" +
+                "----+-----|----\n" +
+                " F  |  B  |  z \n" +
+                " o  |  a  |    \n" +
+                "    |  r  |    " , fmt.toString());
+    }
+
+    @Test
     public void specialJunctionPointsAreSupported() {
         final Object[][] data = {
             {"A", "B", "C"},
