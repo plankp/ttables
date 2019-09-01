@@ -1,9 +1,10 @@
 package com.ymcmp.ttable;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import java.util.stream.Collectors;
+
+import java.util.function.Consumer;
 
 import com.ymcmp.ttable.border.Border;
 import com.ymcmp.ttable.divider.Divider;
@@ -91,52 +92,38 @@ public class TableFormatter {
             return this.cached;
         }
 
-        final String result = this.generateTable();
+        final StringBuilder sb = new StringBuilder();
+        this.generateTable(line -> sb.append(line).append('\n'));
+
+        final int len = sb.length();
+        if (len > 0) {
+            // Remove trailing '\n'
+            sb.deleteCharAt(len - 1);
+        }
+
+        final String result = sb.toString();
         this.cached = result;
         return result;
     }
 
-    private String generateTable() {
-        final LinkedList<String> logicalLines = new LinkedList<>();
-
-        if (this.border.hasTopBorder()) {
-            logicalLines.add(this.generateHorizontalLine(
-                    -1,
-                    this.border.getTopLeftCorner(),
-                    this.border.getTopBarElement(),
-                    this.border.getTopRightCorner()));
-        }
+    public void generateTable(Consumer<? super String> consumer) {
+        this.generateTopBorder(consumer);
 
         for (int i = 0; i < this.rows; ++i) {
-            logicalLines.add(this.generateRow(i));
-
-            final int rowDiv = this.divider.getRowDivider(i);
-            if (rowDiv >= 0) {
-                logicalLines.add(this.generateHorizontalLine(
-                        i,
-                        this.border.getLeftBarElement(),
-                        (char) rowDiv,
-                        this.border.getRightBarElement()));
-            }
+            this.generateRow(consumer, i);
+            this.generateHorizontalDivider(consumer, i);
         }
 
-        if (this.border.hasBottomBorder()) {
-            logicalLines.add(this.generateHorizontalLine(
-                    this.rows,
-                    this.border.getBottomLeftCorner(),
-                    this.border.getBottomBarElement(),
-                    this.border.getBottomRightCorner()));
-        }
-
-        return logicalLines.stream()
-                .collect(Collectors.joining("\n"));
+        this.generateBottomBorder(consumer);
     }
 
-    private String generateRow(int rowIdx) {
+    public void generateRow(Consumer<? super String> consumer, int rowIdx) {
         final String[][] row = this.table[rowIdx];
         final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < this.rowMaxLength[rowIdx]; ++i) {
+            sb.setLength(0);
+
             final String leftBar = this.border.getLeftBarElement();
             if (!leftBar.isEmpty()) {
                 sb.append(leftBar);
@@ -172,15 +159,40 @@ public class TableFormatter {
                 }
                 sb.append(rightBar);
             }
-            sb.append('\n');
-        }
 
-        final int len = sb.length();
-        if (len > 0) {
-            sb.deleteCharAt(len - 1);
+            consumer.accept(sb.toString());
         }
+    }
 
-        return sb.toString();
+    public void generateTopBorder(Consumer<? super String> consumer) {
+        if (this.border.hasTopBorder()) {
+            consumer.accept(this.generateHorizontalLine(
+                    -1,
+                    this.border.getTopLeftCorner(),
+                    this.border.getTopBarElement(),
+                    this.border.getTopRightCorner()));
+        }
+    }
+
+    public void generateBottomBorder(Consumer<? super String> consumer) {
+        if (this.border.hasBottomBorder()) {
+            consumer.accept(this.generateHorizontalLine(
+                    this.rows,
+                    this.border.getBottomLeftCorner(),
+                    this.border.getBottomBarElement(),
+                    this.border.getBottomRightCorner()));
+        }
+    }
+
+    public void generateHorizontalDivider(Consumer<? super String> consumer, int rowIdx) {
+        final int rowDiv = this.divider.getRowDivider(rowIdx);
+        if (rowDiv >= 0) {
+            consumer.accept(this.generateHorizontalLine(
+                    rowIdx,
+                    this.border.getLeftBarElement(),
+                    (char) rowDiv,
+                    this.border.getRightBarElement()));
+        }
     }
 
     private String generateHorizontalLine(int rowIdx, String leftElement, char barElement, String rightElement) {
