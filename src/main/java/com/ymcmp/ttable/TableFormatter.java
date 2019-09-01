@@ -23,6 +23,8 @@ public class TableFormatter {
     private Border border = new Border();
     private Divider divider = new Divider();
 
+    private boolean confSpacingAfterRightBorder = false;
+    private boolean confSpacingAfterLeftBorder = false;
     private boolean confSpacingAroundColumnDivider = true;
     private boolean confFillRowDividerAtJunction = true;
 
@@ -43,6 +45,16 @@ public class TableFormatter {
     public void updateDivider(Divider divider) {
         this.cached = null;
         this.divider = divider == null ? new Divider() : divider;
+    }
+
+    public void shouldPlaceSpacingAfterRightBorder(boolean flag) {
+        this.cached = null;
+        this.confSpacingAfterRightBorder = flag;
+    }
+
+    public void shouldPlaceSpacingAfterLeftBorder(boolean flag) {
+        this.cached = null;
+        this.confSpacingAfterLeftBorder = flag;
     }
 
     public void shouldPlaceSpacingAroundColumnDivider(boolean flag) {
@@ -125,7 +137,13 @@ public class TableFormatter {
         final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < this.rowMaxLength[rowIdx]; ++i) {
-            sb.append(this.border.getLeftBarElement());
+            final String leftBar = this.border.getLeftBarElement();
+            if (!leftBar.isEmpty()) {
+                sb.append(leftBar);
+                if (this.confSpacingAfterLeftBorder) {
+                    sb.append(' ');
+                }
+            }
 
             for (int j = 0; j < this.columns; ++j) {
                 final String[] cellLines = row[j];
@@ -146,7 +164,15 @@ public class TableFormatter {
             }
 
             sb.deleteCharAt(sb.length() - 1);
-            sb.append(this.border.getRightBarElement()).append('\n');
+
+            final String rightBar = this.border.getRightBarElement();
+            if (!rightBar.isEmpty()) {
+                if (this.confSpacingAfterRightBorder) {
+                    sb.append(' ');
+                }
+                sb.append(rightBar);
+            }
+            sb.append('\n');
         }
 
         final int len = sb.length();
@@ -160,7 +186,13 @@ public class TableFormatter {
     private String generateHorizontalLine(int rowIdx, String leftElement, char barElement, String rightElement) {
         final StringBuilder sb = new StringBuilder();
 
-        sb.append(this.getSpecialJunction(rowIdx, -1, leftElement));
+        final String leftBar = this.getSpecialJunction(rowIdx, -1, leftElement);
+        if (!leftBar.isEmpty()) {
+            sb.append(leftBar);
+            if (this.confSpacingAfterLeftBorder) {
+                sb.append(barElement);
+            }
+        }
 
         for (int j = 0; j < this.columns; ++j) {
             final int limit = this.colMaxLength[j] + 1;
@@ -184,7 +216,14 @@ public class TableFormatter {
         }
 
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(this.getSpecialJunction(rowIdx, this.columns, rightElement));
+
+        final String rightBar = this.getSpecialJunction(rowIdx, this.columns, rightElement);
+        if (!rightBar.isEmpty()) {
+            if (this.confSpacingAfterRightBorder) {
+                sb.append(barElement);
+            }
+            sb.append(rightBar);
+        }
 
         return sb.toString();
     }

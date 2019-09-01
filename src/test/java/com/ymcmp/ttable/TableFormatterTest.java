@@ -127,14 +127,13 @@ public class TableFormatterTest {
     }
 
     @Test
-    public void spacingAroundColumnDividerIsOptional() {
+    public void spacingAroundColumnsIsOptional() {
         final Object[][] data = {
             {"A", "B", "C"},
             {1, 2, 3},
             {1.0, 'q', null}
         };
         final TableFormatter fmt = TableUtils.fromArray(data).align();
-        fmt.shouldPlaceSpacingAroundColumnDivider(false);
         fmt.updateBorder(ASCII_BORDER);
 
         final DividerBuilder div = DividerBuilder
@@ -150,6 +149,7 @@ public class TableFormatterTest {
 
         fmt.updateDivider(div.build());
 
+        fmt.shouldPlaceSpacingAroundColumnDivider(false);
         assertEquals(
                 "+---+-*----+\n" +
                 "| A |B| C  |\n" +
@@ -158,6 +158,36 @@ public class TableFormatterTest {
                 "<---+-+----~\n" +
                 "|1.0|q|null|\n" +
                 "+---!-@----+", fmt.toString());
+
+        fmt.shouldPlaceSpacingAfterLeftBorder(true);
+        fmt.shouldPlaceSpacingAfterRightBorder(true);
+        fmt.shouldPlaceSpacingAroundColumnDivider(true);
+        assertEquals(
+                "+-----+---*------+\n" +
+                "|  A  | B |  C   |\n" +
+                "=-----+---+------>\n" +
+                "|  1  | 2 |  3   |\n" +
+                "<-----+---+------~\n" +
+                "| 1.0 | q | null |\n" +
+                "+-----!---@------+", fmt.toString());
+    }
+
+    @Test
+    public void spacingOptionsOnlyHappenIfColumnsAndBordersExist() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+
+        fmt.shouldPlaceSpacingAfterLeftBorder(true);
+        fmt.shouldPlaceSpacingAfterRightBorder(true);
+        fmt.shouldPlaceSpacingAroundColumnDivider(true);
+        assertEquals(
+                " A  B  C  \n" +
+                " 1  2  3  \n" +
+                "1.0 q null", fmt.toString());
     }
 
     @Test
