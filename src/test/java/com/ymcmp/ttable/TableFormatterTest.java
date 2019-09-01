@@ -100,6 +100,40 @@ public class TableFormatterTest {
     }
 
     @Test
+    public void spacingAroundColumnDividerIsOptional() {
+        final Object[][] data = {
+            {"A", "B", "C"},
+            {1, 2, 3},
+            {1.0, 'q', null}
+        };
+        final TableFormatter fmt = TableUtils.fromArray(data).align();
+        fmt.shouldPlaceSpacingAroundColumnDivider(false);
+        fmt.updateBorder(ASCII_BORDER);
+
+        final DividerBuilder div = DividerBuilder
+                .asciiGridTemplate(fmt.rows, fmt.columns)
+                .addJunction(-1, 0, '+')
+                .addJunction(-1, 1, '*')
+                .addJunction(3, 0, '!')
+                .addJunction(3, 1, '@')
+                .addJunction(0, -1, '=')
+                .addJunction(1, -1, '<')
+                .addJunction(0, 3, '>')
+                .addJunction(1, 3, '~');
+
+        fmt.updateDivider(div.build());
+
+        assertEquals(
+                "+---+-*----+\n" +
+                "| A |B| C  |\n" +
+                "=---+-+---->\n" +
+                "| 1 |2| 3  |\n" +
+                "<---+-+----~\n" +
+                "|1.0|q|null|\n" +
+                "+---!-@----+", fmt.toString());
+    }
+
+    @Test
     public void borderAreAppliedCorrectly() {
         final Object[][] data = {
             {"A", "B", "C"},

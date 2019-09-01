@@ -23,6 +23,8 @@ public class TableFormatter {
     private Border border = new Border();
     private Divider divider = new Divider();
 
+    private boolean confSpacingAroundColumnDivider = true;
+
     public TableFormatter(String[][][] table, int[] rowMaxLength, int[] colMaxLength) {
         this.table = table;
         this.rowMaxLength = rowMaxLength;
@@ -40,6 +42,11 @@ public class TableFormatter {
     public void updateDivider(Divider divider) {
         this.cached = null;
         this.divider = divider == null ? new Divider() : divider;
+    }
+
+    public void shouldPlaceSpacingAroundColumnDivider(boolean flag) {
+        this.cached = null;
+        this.confSpacingAroundColumnDivider = flag;
     }
 
     private char getJunctionOrDefault(int row, int col, char defaultChar) {
@@ -120,7 +127,15 @@ public class TableFormatter {
 
                 final int colDiv = this.divider.getColumnDivider(j);
                 if (colDiv >= 0) {
-                    sb.append((char) colDiv).append(' ');
+                    if (!this.confSpacingAroundColumnDivider) {
+                        sb.deleteCharAt(sb.length() - 1);
+                    }
+
+                    sb.append((char) colDiv);
+
+                    if (this.confSpacingAroundColumnDivider) {
+                        sb.append(' ');
+                    }
                 }
             }
 
@@ -148,7 +163,15 @@ public class TableFormatter {
             }
 
             if (this.divider.getColumnDivider(j) >= 0) {
-                sb.append(this.getJunctionOrDefault(rowIdx, j, barElement)).append(barElement);
+                if (!this.confSpacingAroundColumnDivider) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+
+                sb.append(this.getJunctionOrDefault(rowIdx, j, barElement));
+
+                if (this.confSpacingAroundColumnDivider) {
+                    sb.append(barElement);
+                }
             }
         }
 
