@@ -15,22 +15,10 @@ public final class Range {
     }
 
     public static Range inclusiveRange(int start, int end) {
-        if (start > end) {
-            final int tmp = start;
-            start = end;
-            end = tmp;
-        }
-
         return new Range(start, end);
     }
 
     public static Range upperExclusiveRange(int start, int end) {
-        if (start > end) {
-            final int tmp = start;
-            start = end;
-            end = tmp;
-        }
-
         return new Range(start, end - 1);
     }
 
