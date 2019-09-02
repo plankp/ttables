@@ -16,16 +16,25 @@ public class TableBuilder {
             new com.ymcmp.ttable.width.CenterAlignmentStrategy(),
             new com.ymcmp.ttable.height.CenterAlignmentStrategy());
 
+    public static final int DYNAMIC_SIZE = -1;
+
     public final int rows;
     public final int columns;
 
     private final Cell[][] table;
+    private final int[] rowHeightLimit;
+    private final int[] colWidthLimit;
 
     public TableBuilder(final int rows, final int columns) {
         this.rows = rows;
         this.columns = columns;
 
         this.table = new Cell[rows][columns];
+        this.rowHeightLimit = new int[rows];
+        this.colWidthLimit = new int[columns];
+
+        Arrays.fill(this.rowHeightLimit, DYNAMIC_SIZE);
+        Arrays.fill(this.colWidthLimit, DYNAMIC_SIZE);
     }
 
     public Cell getCell(int row, int col) {
@@ -38,6 +47,14 @@ public class TableBuilder {
             this.table[row][col] = cell = new Cell();
         }
         return cell;
+    }
+
+    public void setMaxHeightForRow(int row, int height) {
+        this.rowHeightLimit[row] = Math.max(DYNAMIC_SIZE, height);
+    }
+
+    public void setMaxWidthForColumn(int col, int width) {
+        this.colWidthLimit[col] = Math.max(DYNAMIC_SIZE, width);
     }
 
     public TableFormatter align() {
@@ -57,14 +74,14 @@ public class TableBuilder {
     }
 
     private TableFormatter mapCellToFormat(final AlignmentStrategy alignStrat, CellFormatMapper mapper) {
-        final int[] rowMaxLength = new int[rows];
-        final int[] colMaxLength = new int[columns];
+        final int[] rowMaxLength = new int[this.rows];
+        final int[] colMaxLength = new int[this.columns];
         this.recomputeCellSizes(rowMaxLength, colMaxLength);
 
-        final String[][][] result = new String[rows][columns][];
-        for (int i = 0; i < rows; ++i) {
+        final String[][][] result = new String[this.rows][this.columns][];
+        for (int i = 0; i < this.rows; ++i) {
             final int newHeight = rowMaxLength[i];
-            for (int j = 0; j < columns; ++j) {
+            for (int j = 0; j < this.columns; ++j) {
                 result[i][j] = mapper.map(this.ensureGetCell(i, j), newHeight, colMaxLength[j], alignStrat);
             }
         }
@@ -76,14 +93,23 @@ public class TableBuilder {
         for (int i = 0; i < this.rows; ++i) {
             for (int j = 0; j < this.columns; ++j) {
                 final Cell cell = this.ensureGetCell(i, j);
-                final int lineCount = cell.getLineCount();
-                final int longestLineLength = cell.getMaxLineLength();
 
-                if (rowMaxLength[i] < lineCount) {
-                    rowMaxLength[i] = lineCount;
+                if (this.rowHeightLimit[i] == DYNAMIC_SIZE) {
+                    final int lineCount = cell.getLineCount();
+                    if (rowMaxLength[i] < lineCount) {
+                        rowMaxLength[i] = lineCount;
+                    }
+                } else {
+                    rowMaxLength[i] = this.rowHeightLimit[i];
                 }
-                if (colMaxLength[j] < longestLineLength) {
-                    colMaxLength[j] = longestLineLength;
+
+                if (this.colWidthLimit[j] == DYNAMIC_SIZE) {
+                    final int longestLineLength = cell.getMaxLineLength();
+                    if (colMaxLength[j] < longestLineLength) {
+                        colMaxLength[j] = longestLineLength;
+                    }
+                } else {
+                    colMaxLength[j] = this.colWidthLimit[j];
                 }
             }
         }
