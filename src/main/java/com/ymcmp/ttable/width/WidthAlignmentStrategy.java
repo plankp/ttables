@@ -1,6 +1,8 @@
 package com.ymcmp.ttable.width;
 
+import com.ymcmp.ttable.Range;
+
 public interface WidthAlignmentStrategy {
 
-    public int getFirstCharOffset(int chars, int width);
+    public Range getCharRange(int chars, int width);
 }

@@ -16,8 +16,8 @@ public final class AlignmentStrategy implements WidthAlignmentStrategy, HeightAl
     // --- Forward WidthAlignmentStrategy methods ---
 
     @Override
-    public int getFirstCharOffset(int chars, int width) {
-        return this.widthAlignmentStrategy.getFirstCharOffset(chars, width);
+    public Range getCharRange(int chars, int width) {
+        return this.widthAlignmentStrategy.getCharRange(chars, width);
     }
 
     // --- Forward HeightAlignmentStrategy methods ---

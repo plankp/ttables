@@ -63,13 +63,11 @@ public final class Cell {
         // Only process the region where there is actually text
         lineRange.loop(height -> {
             final String line = this.lines[height - lineRange.start];
-            final int leftPadding = strategy.getFirstCharOffset(line.length(), newWidth);
-            final int rightPadding = newWidth - line.length() - leftPadding;
-
+            final Range charRange = strategy.getCharRange(line.length(), newWidth);
             result[height] = new StringBuilder(newWidth)
-                    .append(repeatChars(leftPadding, this.padding))
+                    .append(repeatChars(charRange.start, this.padding))
                     .append(line)
-                    .append(repeatChars(rightPadding, this.padding))
+                    .append(repeatChars(newWidth - charRange.end - 1, this.padding))
                     .toString();
         });
 
