@@ -22,6 +22,10 @@ public final class Range {
         return new Range(start, end - 1);
     }
 
+    public int difference() {
+        return this.end - this.start + 1;
+    }
+
     public void loop(IntConsumer consumer) {
         for (int i = this.start; i <= this.end; ++i) {
             consumer.accept(i);
