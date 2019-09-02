@@ -1,9 +1,11 @@
 package com.ymcmp.ttable.height;
 
+import com.ymcmp.ttable.Range;
+
 public class BottomAlignmentStrategy implements HeightAlignmentStrategy {
 
     @Override
-    public int getFirstLineOffset(int lines, int height) {
-        return height - lines;
+    public Range getLineRange(int lines, int height) {
+        return Range.upperExclusiveRange(height - lines, height);
     }
 }

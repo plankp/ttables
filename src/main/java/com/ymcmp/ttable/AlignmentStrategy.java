@@ -23,7 +23,7 @@ public final class AlignmentStrategy implements WidthAlignmentStrategy, HeightAl
     // --- Forward HeightAlignmentStrategy methods ---
 
     @Override
-    public int getFirstLineOffset(int lines, int height) {
-        return this.heightAlignmentStrategy.getFirstLineOffset(lines, height);
+    public Range getLineRange(int lines, int height) {
+        return this.heightAlignmentStrategy.getLineRange(lines, height);
     }
 }

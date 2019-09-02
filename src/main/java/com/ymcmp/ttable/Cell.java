@@ -56,27 +56,22 @@ public final class Cell {
         final String fullPad = new String(repeatChars(newWidth, this.padding));
 
         // Align height
-        final int startHeight = strategy.getFirstLineOffset(this.lines.length, result.length);
-        Arrays.fill(result, 0, startHeight, fullPad);
-        Arrays.fill(result, startHeight + this.lines.length, result.length, fullPad);
+        final Range lineRange = strategy.getLineRange(this.lines.length, newHeight);
+        lineRange.outerFill(result, fullPad);
 
         // Align width
         // Only process the region where there is actually text
-        final StringBuilder buffer = new StringBuilder(newWidth);
-        for (int i = 0; i < this.lines.length; ++i) {
-            final int height = startHeight + i;
-
-            final String line = this.lines[i];
+        lineRange.loop(height -> {
+            final String line = this.lines[height - lineRange.start];
             final int leftPadding = strategy.getFirstCharOffset(line.length(), newWidth);
             final int rightPadding = newWidth - line.length() - leftPadding;
 
-            buffer.setLength(0);
-            result[height] = buffer
+            result[height] = new StringBuilder(newWidth)
                     .append(repeatChars(leftPadding, this.padding))
                     .append(line)
                     .append(repeatChars(rightPadding, this.padding))
                     .toString();
-        }
+        });
 
         return result;
     }
