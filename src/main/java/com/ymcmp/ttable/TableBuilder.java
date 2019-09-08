@@ -1,6 +1,6 @@
 package com.ymcmp.ttable;
 
-import java.util.Arrays;
+import java.util.HashMap;
 
 import com.ymcmp.ttable.size.CellSizeStrategy;
 import com.ymcmp.ttable.size.DynamicSizeStrategy;
@@ -24,19 +24,16 @@ public class TableBuilder {
     public final int columns;
 
     private final Cell[][] table;
-    private final CellSizeStrategy[] rowSizeStrat;
-    private final CellSizeStrategy[] colSizeStrat;
+    private final HashMap<Integer, CellSizeStrategy> rowSizeStrat;
+    private final HashMap<Integer, CellSizeStrategy> colSizeStrat;
 
     public TableBuilder(final int rows, final int columns) {
         this.rows = rows;
         this.columns = columns;
 
         this.table = new Cell[rows][columns];
-        this.rowSizeStrat = new CellSizeStrategy[rows];
-        this.colSizeStrat = new CellSizeStrategy[columns];
-
-        Arrays.fill(this.rowSizeStrat, DEFAULT_SIZE_STRAT);
-        Arrays.fill(this.colSizeStrat, DEFAULT_SIZE_STRAT);
+        this.rowSizeStrat = new HashMap<>();
+        this.colSizeStrat = new HashMap<>();
     }
 
     public Cell getCell(int row, int col) {
@@ -51,12 +48,28 @@ public class TableBuilder {
         return cell;
     }
 
-    public void setSizingStrategyForRow(int row, CellSizeStrategy strat) {
-        this.rowSizeStrat[row] = strat != null ? strat : DEFAULT_SIZE_STRAT;
+    public void setSizingStrategyForRow(final int row, final CellSizeStrategy strat) {
+        if (row < 0 || row >= this.rows) {
+            throw new IndexOutOfBoundsException(row);
+        }
+
+        if (strat == null) {
+            this.rowSizeStrat.remove(row);
+        } else {
+            this.rowSizeStrat.put(row, strat);
+        }
     }
 
-    public void setSizingStrategyForColumn(int col, CellSizeStrategy strat) {
-        this.colSizeStrat[col] = strat != null ? strat : DEFAULT_SIZE_STRAT;
+    public void setSizingStrategyForColumn(final int col, final CellSizeStrategy strat) {
+        if (col < 0 || col >= this.columns) {
+            throw new IndexOutOfBoundsException(col);
+        }
+
+        if (strat == null) {
+            this.colSizeStrat.remove(col);
+        } else {
+            this.colSizeStrat.put(col, strat);
+        }
     }
 
     public TableFormatter align() {
@@ -96,12 +109,14 @@ public class TableBuilder {
             for (int j = 0; j < this.columns; ++j) {
                 final Cell cell = this.ensureGetCell(i, j);
 
-                final int resolvedLineCount = this.rowSizeStrat[i].resolveSize(cell.getLineCount());
+                final int resolvedLineCount = this.rowSizeStrat.getOrDefault(i, DEFAULT_SIZE_STRAT)
+                        .resolveSize(cell.getLineCount());
                 if (rowMaxLength[i] < resolvedLineCount) {
                     rowMaxLength[i] = resolvedLineCount;
                 }
 
-                final int resolvedLineLength = this.colSizeStrat[j].resolveSize(cell.getMaxLineLength());
+                final int resolvedLineLength = this.colSizeStrat.getOrDefault(j, DEFAULT_SIZE_STRAT)
+                        .resolveSize(cell.getMaxLineLength());
                 if (colMaxLength[j] < resolvedLineLength) {
                     colMaxLength[j] = resolvedLineLength;
                 }
