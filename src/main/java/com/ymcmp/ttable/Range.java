@@ -26,6 +26,10 @@ public final class Range {
         return this.end - this.start + 1;
     }
 
+    public int clamp(int value) {
+        return Math.max(this.start, Math.min(this.end, value));
+    }
+
     public void loop(IntConsumer consumer) {
         for (int i = this.start; i <= this.end; ++i) {
             consumer.accept(i);
