@@ -50,7 +50,7 @@ public class TableBuilder {
 
     public void setSizingStrategyForRow(final int row, final CellSizeStrategy strat) {
         if (row < 0 || row >= this.rows) {
-            throw new IndexOutOfBoundsException(row);
+            throw new IndexOutOfBoundsException("Accessing row " + row + " out of " + this.rows);
         }
 
         if (strat == null) {
@@ -62,7 +62,7 @@ public class TableBuilder {
 
     public void setSizingStrategyForColumn(final int col, final CellSizeStrategy strat) {
         if (col < 0 || col >= this.columns) {
-            throw new IndexOutOfBoundsException(col);
+            throw new IndexOutOfBoundsException("Accessing column " + col + " out of " + this.columns);
         }
 
         if (strat == null) {
