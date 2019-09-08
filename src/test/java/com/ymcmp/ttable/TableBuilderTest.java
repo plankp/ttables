@@ -4,6 +4,10 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+import com.ymcmp.ttable.size.LowerLimitStrategy;
+import com.ymcmp.ttable.size.RangeLimitStrategy;
+import com.ymcmp.ttable.size.UpperLimitStrategy;
+
 import com.ymcmp.ttable.divider.DividerBuilder;
 
 import org.junit.Test;
@@ -145,9 +149,12 @@ public class TableBuilderTest {
         table.getCell(1, 1).setLines(lines);
         table.getCell(2, 1).setText("Hello!");
 
-        table.setMaxHeightForRow(0, 1);
-        table.setMaxWidthForColumn(0, 6);
-        table.setMaxWidthForColumn(1, 10);
+        table.setSizingStrategyForRow(0, UpperLimitStrategy.atMost(1));
+        table.setSizingStrategyForRow(1, new RangeLimitStrategy(Range.inclusiveRange(1, 5)));
+        table.setSizingStrategyForRow(2, LowerLimitStrategy.atLeast(3));
+
+        table.setSizingStrategyForColumn(0, UpperLimitStrategy.atMost(6));
+        table.setSizingStrategyForColumn(1, UpperLimitStrategy.atMost(10));
 
         final TableFormatter fmt = table.align();
         fmt.updateDivider(new DividerBuilder()
@@ -163,6 +170,8 @@ public class TableBuilderTest {
                 "Center | consectetu\n" +
                 "       | sed do eiu\n" +
                 "-------|-----------\n" +
-                "Bottom |   Hello!  ", fmt.toString());
+                "       |           \n" +
+                "       |   Hello!  \n" +
+                "Bottom |           ", fmt.toString());
     }
 }

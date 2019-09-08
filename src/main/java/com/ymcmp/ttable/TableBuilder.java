@@ -2,6 +2,8 @@ package com.ymcmp.ttable;
 
 import java.util.Arrays;
 
+import com.ymcmp.ttable.size.CellSizeStrategy;
+import com.ymcmp.ttable.size.DynamicSizeStrategy;
 import com.ymcmp.ttable.width.WidthAlignmentStrategy;
 import com.ymcmp.ttable.height.HeightAlignmentStrategy;
 
@@ -16,25 +18,25 @@ public class TableBuilder {
             new com.ymcmp.ttable.width.CenterAlignmentStrategy(),
             new com.ymcmp.ttable.height.CenterAlignmentStrategy());
 
-    public static final int DYNAMIC_SIZE = -1;
+    public static final CellSizeStrategy DEFAULT_SIZE_STRAT = new DynamicSizeStrategy();
 
     public final int rows;
     public final int columns;
 
     private final Cell[][] table;
-    private final int[] rowHeightLimit;
-    private final int[] colWidthLimit;
+    private final CellSizeStrategy[] rowSizeStrat;
+    private final CellSizeStrategy[] colSizeStrat;
 
     public TableBuilder(final int rows, final int columns) {
         this.rows = rows;
         this.columns = columns;
 
         this.table = new Cell[rows][columns];
-        this.rowHeightLimit = new int[rows];
-        this.colWidthLimit = new int[columns];
+        this.rowSizeStrat = new CellSizeStrategy[rows];
+        this.colSizeStrat = new CellSizeStrategy[columns];
 
-        Arrays.fill(this.rowHeightLimit, DYNAMIC_SIZE);
-        Arrays.fill(this.colWidthLimit, DYNAMIC_SIZE);
+        Arrays.fill(this.rowSizeStrat, DEFAULT_SIZE_STRAT);
+        Arrays.fill(this.colSizeStrat, DEFAULT_SIZE_STRAT);
     }
 
     public Cell getCell(int row, int col) {
@@ -49,12 +51,12 @@ public class TableBuilder {
         return cell;
     }
 
-    public void setMaxHeightForRow(int row, int height) {
-        this.rowHeightLimit[row] = Math.max(DYNAMIC_SIZE, height);
+    public void setSizingStrategyForRow(int row, CellSizeStrategy strat) {
+        this.rowSizeStrat[row] = strat != null ? strat : DEFAULT_SIZE_STRAT;
     }
 
-    public void setMaxWidthForColumn(int col, int width) {
-        this.colWidthLimit[col] = Math.max(DYNAMIC_SIZE, width);
+    public void setSizingStrategyForColumn(int col, CellSizeStrategy strat) {
+        this.colSizeStrat[col] = strat != null ? strat : DEFAULT_SIZE_STRAT;
     }
 
     public TableFormatter align() {
@@ -94,22 +96,14 @@ public class TableBuilder {
             for (int j = 0; j < this.columns; ++j) {
                 final Cell cell = this.ensureGetCell(i, j);
 
-                if (this.rowHeightLimit[i] == DYNAMIC_SIZE) {
-                    final int lineCount = cell.getLineCount();
-                    if (rowMaxLength[i] < lineCount) {
-                        rowMaxLength[i] = lineCount;
-                    }
-                } else {
-                    rowMaxLength[i] = this.rowHeightLimit[i];
+                final int resolvedLineCount = this.rowSizeStrat[i].resolveSize(cell.getLineCount());
+                if (rowMaxLength[i] < resolvedLineCount) {
+                    rowMaxLength[i] = resolvedLineCount;
                 }
 
-                if (this.colWidthLimit[j] == DYNAMIC_SIZE) {
-                    final int longestLineLength = cell.getMaxLineLength();
-                    if (colMaxLength[j] < longestLineLength) {
-                        colMaxLength[j] = longestLineLength;
-                    }
-                } else {
-                    colMaxLength[j] = this.colWidthLimit[j];
+                final int resolvedLineLength = this.colSizeStrat[j].resolveSize(cell.getMaxLineLength());
+                if (colMaxLength[j] < resolvedLineLength) {
+                    colMaxLength[j] = resolvedLineLength;
                 }
             }
         }
