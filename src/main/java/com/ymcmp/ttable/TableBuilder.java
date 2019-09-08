@@ -106,11 +106,11 @@ public class TableBuilder {
     private void recomputeCellSizes(int[] rowMaxLength, int[] colMaxLength) {
         // Fill in the maximum length for each row and column
         for (int i = 0; i < this.rows; ++i) {
+            final CellSizeStrategy currentRowSizeStrat = this.rowSizeStrat.getOrDefault(i, DEFAULT_SIZE_STRAT);
             for (int j = 0; j < this.columns; ++j) {
                 final Cell cell = this.ensureGetCell(i, j);
 
-                final int resolvedLineCount = this.rowSizeStrat.getOrDefault(i, DEFAULT_SIZE_STRAT)
-                        .resolveSize(cell.getLineCount());
+                final int resolvedLineCount = currentRowSizeStrat.resolveSize(cell.getLineCount());
                 if (rowMaxLength[i] < resolvedLineCount) {
                     rowMaxLength[i] = resolvedLineCount;
                 }
